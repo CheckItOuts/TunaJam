@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TunaJam</string>
+    <string name="button_connexion">Se connecter avec Spotify</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>
