@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -12,17 +13,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TunaJam"
         tools:targetApi="31">
+
         <activity
-            android:name=".MainActivity"
+            android:name=".spotify_login.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:launchMode="standard"
             android:theme="@style/Theme.TunaJam">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.tunajam.app" android:host="callback"/>
+
             </intent-filter>
         </activity>
+        <activity
+            android:name=".home.HomeActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
+
     </application>
 
 </manifest>

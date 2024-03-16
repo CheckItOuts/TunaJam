@@ -2,4 +2,7 @@
 <resources>
 
     <style name="Theme.TunaJam" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Button.Green" parent="ThemeOverlay.AppCompat">
+        <item name="colorAccent">@color/green</item>
+    </style>
 </resources>
