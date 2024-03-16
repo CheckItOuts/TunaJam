@@ -30,6 +30,12 @@
 
             </intent-filter>
         </activity>
+        <activity
+            android:name=".home.HomeActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
+
     </application>
 
 </manifest>
