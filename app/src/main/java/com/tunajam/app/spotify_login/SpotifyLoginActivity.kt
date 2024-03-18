@@ -5,24 +5,15 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.tunajam.app.R
-import com.tunajam.app.ui.theme.TunaJamTheme
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.user_data.UserData
-import okhttp3.*
-import org.json.JSONObject
-import java.io.IOException
 
 
 const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
-const val CLIENT_SECRET = "fd0de51ee127491fb6472f89bcd149d5"
 const val REDIRECT_URI = "com.tunajam.app://callback"
 const val REQUEST_CODE = 1337 // On peut mettre n'importe quel nombre ici
 
@@ -69,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 AuthorizationResponse.Type.CODE -> {
                     val authorizationCode = response.code
                     println(authorizationCode)
-                    exchangeCodeForTokens(authorizationCode) { accessToken, refreshToken, expiresIn ->
+                    SpotifyAPI.exchangeCodeForTokens(authorizationCode) { accessToken, refreshToken, expiresIn ->
                         if (accessToken != null && refreshToken != null && expiresIn != null) {
                             navigateToHome(accessToken, refreshToken)
                         } else {
@@ -92,50 +83,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TunaJamTheme {
-        Greeting("Android")
-    }
-}
-fun exchangeCodeForTokens(authorizationCode: String, callback: (String?, String?, String?) -> Unit) {
-    val formBodyBuilder = FormBody.Builder()
-        .add("client_id", CLIENT_ID)
-        .add("client_secret", CLIENT_SECRET)
-        .add("redirect_uri", REDIRECT_URI)
-        .add("code", authorizationCode)
-        .add("grant_type", "authorization_code")
-
-
-    val requestBody = formBodyBuilder.build()
-
-    val request = Request.Builder()
-        .url("https://accounts.spotify.com/api/token")
-        .post(requestBody)
-        .build()
-
-    OkHttpClient().newCall(request).enqueue(object : Callback {
-        override fun onResponse(call: Call, response: Response) {
-            val responseBody = response.body?.string()
-            val jsonObject = JSONObject(responseBody.toString())
-            val accessToken = jsonObject.optString("access_token")
-            val refreshToken = jsonObject.optString("refresh_token")
-            val expiresIn = jsonObject.optInt("expires_in")
-            callback(accessToken, refreshToken, expiresIn.toString())
-        }
-
-        override fun onFailure(call: Call, e: IOException) {
-            // Handle failure
-            callback(null, null, null)
-        }
-    })
-}
