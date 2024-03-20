@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
         )
         // Add offline access to get a refresh token
         builder.setShowDialog(true) // Afficher une boîte de dialogue pour l'authentification
-        builder.setScopes(arrayOf("user-read-email", "user-library-read", "user-library-modify")) // Les permissions que l'on demande à l'utilisateur
+        builder.setScopes(arrayOf("user-read-email", "user-library-read", "user-library-modify", "user-top-read")) // Les permissions que l'on demande à l'utilisateur
         val request = builder.build() // On construit la requête d'authentification
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request) // On ouvre l'activité d'authentification
     }
@@ -59,7 +59,6 @@ class MainActivity : ComponentActivity() {
             when (response.type) {
                 AuthorizationResponse.Type.CODE -> {
                     val authorizationCode = response.code
-                    println(authorizationCode)
                     SpotifyAPI.exchangeCodeForTokens(authorizationCode) { accessToken, refreshToken, expiresIn ->
                         if (accessToken != null && refreshToken != null && expiresIn != null) {
                             navigateToHome(accessToken, refreshToken)

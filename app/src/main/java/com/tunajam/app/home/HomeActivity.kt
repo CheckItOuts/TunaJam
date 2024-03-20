@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamTheme
@@ -25,12 +26,20 @@ data class User(val name: String)
 class HomeActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val accessToken = UserData.getAccessToken(this)
+        val accessToken = UserData.getAccessToken(this).toString()
+        val refreshToken = UserData.getRefreshToken(this).toString()
         val spotifyAPI = SpotifyAPI()
-        if (accessToken != null) {
-            spotifyAPI.getUserProfile(accessToken) { displayName ->
-                val user = User(displayName ?: "Unknown")
+        SpotifyAPI.getUserRecommendation(this,accessToken,refreshToken) { tracks ->
+            spotifyAPI.getUserProfile(accessToken) { displayName, _, _, _ ->
+                val user = User(displayName.toString())
                 runOnUiThread {
+                    if (tracks != null) {
+                        for (i in 0 until tracks.size) {
+                            val json = tracks[i]
+                            // Afficher le nom de la chanson dans la console pour le moment
+                            println(json.get("name"))
+                        }
+                    }
                     setContent {
                         TunaJamTheme {
                             UserInfo(user = user)
@@ -38,9 +47,7 @@ class HomeActivity : ComponentActivity(){
                     }
                 }
             }
-            }
         }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +57,7 @@ fun UserInfo(user:User){
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "User Profile") }
+                title = { Text(text = "Accueil") }
             )
         },
         content = {
@@ -64,11 +71,21 @@ fun UserInfo(user:User){
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Name: ${user.name}")
+                    Text(text = "Nom: ${user.name}")
                     Spacer(modifier = Modifier.height(16.dp))
                     // Display other user information as needed
                 }
             }
         }
     )
+}
+
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        TunaJamTheme {
+            UserInfo(user = User("John Doe"))
+        }
+    }
 }
