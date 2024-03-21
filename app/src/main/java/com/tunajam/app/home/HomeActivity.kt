@@ -32,23 +32,36 @@ class HomeActivity : ComponentActivity(){
         SpotifyAPI.getUserRecommendation(this,accessToken,refreshToken) { tracks ->
             spotifyAPI.getUserProfile(accessToken) { displayName, _, _, _ ->
                 val user = User(displayName.toString())
-                runOnUiThread {
-                    if (tracks != null) {
-                        for (i in 0 until tracks.size) {
-                            val json = tracks[i]
-                            // Afficher le nom de la chanson dans la console pour le moment
-                            println(json.get("name"))
-                        }
-                    }
-                    setContent {
-                        TunaJamTheme {
-                            UserInfo(user = user)
+                val parameters = mutableMapOf("seed_genres" to mutableListOf("rock"))
+                SpotifyAPI.getGeneratedPlaylistTracks(this, accessToken, refreshToken, parameters) {genTracks ->
+                            runOnUiThread {
+                                if (tracks != null) {
+                                    for (i in 0 until tracks.size) {
+                                        val json = tracks[i]
+                                        // Afficher le nom de la chanson dans la console pour le moment
+                                        println("User Recommendation $i :")
+                                        println(json.get("name"))
+                                    }
+                                }
+                                if (genTracks != null) {
+                                    for (i in 0 until genTracks.size) {
+                                        val json = genTracks.get(i)
+                                        // Afficher le nom de la chanson dans la console pour le moment
+                                        println("Generated Playlist $i :")
+                                        println(json.get("name"))
+                                    }
+                                }
+                                setContent {
+                                    TunaJamTheme {
+                                        UserInfo(user = user)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
