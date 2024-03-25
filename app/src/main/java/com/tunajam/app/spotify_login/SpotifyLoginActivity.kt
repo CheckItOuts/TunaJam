@@ -45,7 +45,8 @@ class MainActivity : ComponentActivity() {
         )
         // Add offline access to get a refresh token
         builder.setShowDialog(true) // Afficher une boîte de dialogue pour l'authentification
-        builder.setScopes(arrayOf("user-read-email", "user-library-read", "user-library-modify", "user-top-read")) // Les permissions que l'on demande à l'utilisateur
+        builder.setScopes(arrayOf("user-read-email", "user-library-read", "user-library-modify", "user-top-read",
+            "playlist-modify-public","playlist-modify-private")) // Les permissions que l'on demande à l'utilisateur
         val request = builder.build() // On construit la requête d'authentification
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request) // On ouvre l'activité d'authentification
     }
