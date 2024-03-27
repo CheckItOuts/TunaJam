@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "813843384018",
+    "project_id": "tunajam-ffad5",
+    "storage_bucket": "tunajam-ffad5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813843384018:android:acc56b6503f1e604648f0b",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZRAlyOBFBPEU5uM3kecA84udNsAgBZys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813843384018:android:26844312c8dcdd71648f0b",
+        "android_client_info": {
+          "package_name": "com.tunajam.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZRAlyOBFBPEU5uM3kecA84udNsAgBZys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
