@@ -84,4 +84,6 @@ dependencies {
     // Import the Firbease BoM
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-firestore")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.1")
 }

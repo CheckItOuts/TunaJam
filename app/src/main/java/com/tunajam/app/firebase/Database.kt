@@ -69,7 +69,7 @@ class Database {
         user.get()
             .addOnSuccessListener { document ->
                 if (document != NULL){
-                    Log.d(TAG, "DocumentSnapshot data : ${document.data}")
+                    Log.d(TAG, "User : DocumentSnapshot data : ${document.data}")
                 }
                 else {
                     Log.d(TAG, "No such document")
@@ -92,7 +92,7 @@ class Database {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    Log.d(TAG, "${document.data}")
+                    Log.d(TAG, "Friends : ${document.data}")
                 }
             }
             .addOnFailureListener { e ->

@@ -15,7 +15,7 @@
         tools:targetApi="31">
 
         <activity
-            android:name=".spotify_login.MainActivity"
+            android:name=".firebase.MainActivity"
             android:exported="true"
             android:launchMode="standard"
             android:theme="@style/Theme.TunaJam">
@@ -26,7 +26,7 @@
 
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="com.tunajam.app" android:host="callback"/>
+                <!--<data android:scheme="com.tunajam.app" android:host="callback"/>-->
 
             </intent-filter>
         </activity>
