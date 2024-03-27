@@ -1,14 +1,14 @@
-import android.content.ContentValues.TAG
+package com.tunajam.app.firebase
+
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import org.json.JSONObject.NULL
 
-
+const val TAG = "Database class file"
 class Database {
     // Variables de la class
     private val db = Firebase.firestore
-
 
     // Fonctions add
 
@@ -20,7 +20,7 @@ class Database {
      *
      * @return None
      */
-    fun addUser(pseudo : String, mdp : String){
+    fun addUser(pseudo : String, mdp : String): Int {
         val user = hashMapOf(
             "pseudo" to pseudo,
             "mdp" to mdp
@@ -30,6 +30,8 @@ class Database {
             .set(user)
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
             .addOnFailureListener { e->Log.d(TAG, "Error writing document", e) }
+
+        return 1
     }
 
     /**

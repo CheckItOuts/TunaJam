@@ -83,4 +83,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     // Import the Firbease BoM
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-firestore")
 }
