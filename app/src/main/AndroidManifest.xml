@@ -12,6 +12,7 @@
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TunaJam"
+        android:name=".TunaJamApplication"
         tools:targetApi="31">
 
         <activity

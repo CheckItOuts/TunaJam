@@ -128,7 +128,7 @@ class HomeActivity : ComponentActivity() {
             ) {
                 val marsViewModel: TunaJamViewModel =
                     viewModel(factory = TunaJamViewModel.Factory)
-                com.tunajam.app.ui.screens.HomeScreen(
+                HomeScreen(
                     tunaJamUiState = marsViewModel.tunaJamUiState,
                     retryAction = marsViewModel::getTunaJamPhotos,
                     contentPadding = it
