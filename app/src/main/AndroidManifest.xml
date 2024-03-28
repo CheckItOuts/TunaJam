@@ -19,7 +19,6 @@
             android:name=".spotify_login.MainActivity"
             android:exported="true"
             android:launchMode="standard"
-            android:label="@string/app_name"
             android:theme="@style/Theme.TunaJam">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,7 +36,11 @@
             android:exported="true"
             android:launchMode="standard"
             android:theme="@style/Theme.TunaJam" />
-
+        <activity
+            android:name=".playlist.PlaylistGenerationActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
     </application>
 
 </manifest>
