@@ -1,6 +1,7 @@
 package com.tunajam.app.home
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -42,7 +43,6 @@ import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamTheme
 import com.tunajam.app.user_data.UserData
 import org.json.JSONArray
-import org.json.JSONObject
 
 
 data class User(val name: String)
@@ -75,12 +75,6 @@ class HomeActivity : ComponentActivity() {
                 spotifyAPI.getUserProfile(accessToken) { displayName, _, _, _ ->
                     val user = User(displayName.toString())
                     val parameters = mutableMapOf("seed_genres" to mutableListOf("rock"))
-                    SpotifyAPI.getGeneratedPlaylistTracks(
-                        this,
-                        accessToken,
-                        refreshToken,
-                        parameters
-                    ) { genTracks ->
                         runOnUiThread {
                             if (tracks != null) {
                                 for (i in 0 until tracks.size) {
@@ -90,23 +84,11 @@ class HomeActivity : ComponentActivity() {
                                     println(json.get("name"))
                                 }
                             }
-                            if (genTracks != null) {
-                                for (i in 0 until genTracks.size) {
-                                    val json = genTracks.get(i)
-                                    // Afficher le nom de la chanson dans la console pour le moment
-                                    println("Generated Playlist $i :")
-                                    println(json.get("name"))
-                                    val album = json.get("album") as JSONObject
-                                    val imagesArr = album.get("images") as JSONArray
-                                    val images = imagesArr.get(0) as JSONObject
-                                    println(images.get("url"))
-                                }
-                            }
                             setContent {
                                 TunaJamTheme {
                                     val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
                                     Column {
-                                        TunaJamApp(tunaJamUiState)
+                                        TunaJamApp(tunaJamUiState,this@HomeActivity)
                                     }
                                 }
                             }
@@ -151,16 +133,13 @@ class HomeActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun TunaJamApp(tunaJamUiState: TunaJamUiState) {
+    fun TunaJamApp(tunaJamUiState: TunaJamUiState,context: Context) {
         val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
         Scaffold(
             // Je pense que c'est mieux de la laisser fixe
             //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
-            bottomBar = { NavigationButton(onClick = {
-                val intent = Intent(this, PlaylistGenerationActivity::class.java)
-                startActivity(intent)
-                finish() },
+            bottomBar = { NavigationButton(onClick = { navigateToPlaylistGenerationActivity(context) },
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .height(72.dp)
@@ -200,6 +179,9 @@ class HomeActivity : ComponentActivity() {
             modifier = modifier
         )
     }
+fun navigateToPlaylistGenerationActivity(context: Context) {
+    val intent = Intent(context, PlaylistGenerationActivity::class.java)
+    context.startActivity(intent)
 }
 
 @Composable

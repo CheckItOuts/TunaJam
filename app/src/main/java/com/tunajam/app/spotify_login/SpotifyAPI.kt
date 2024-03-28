@@ -325,11 +325,13 @@ class SpotifyAPI {
             OkHttpClient().newCall(request).enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
                     if (!response.isSuccessful) {
+                        println("Error: ${response.code}")
                         callback(null)
                         return
                     }
                     val responseBody = response.body?.string()
                     if (responseBody.isNullOrEmpty()) {
+                        println("Error: Empty response body")
                         callback(null)
                         return
                     }
