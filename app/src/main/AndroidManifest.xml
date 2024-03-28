@@ -41,6 +41,12 @@
             android:exported="true"
             android:launchMode="standard"
             android:theme="@style/Theme.TunaJam" />
+        <activity
+            android:name=".playlist.PlaylistDisplayActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
+
     </application>
 
 </manifest>

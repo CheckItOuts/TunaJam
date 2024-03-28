@@ -72,7 +72,7 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
-                spotifyAPI.getUserProfile(accessToken) { displayName, _, _, _ ->
+                spotifyAPI.getUserProfile(accessToken,this) { displayName, _, _, _ ->
                     val user = User(displayName.toString())
                     val parameters = mutableMapOf("seed_genres" to mutableListOf("rock"))
                         runOnUiThread {

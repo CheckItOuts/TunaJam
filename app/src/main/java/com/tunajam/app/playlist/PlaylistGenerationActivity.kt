@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.user_data.PlaylistData
 import com.tunajam.app.user_data.UserData
 import org.json.JSONArray
 import org.json.JSONObject
@@ -131,8 +132,11 @@ fun ParameterSlider(label: String, value: Float, onValueChange: (Float) -> Unit)
     }
 }
 
-val friendsList = listOf("Friend 1", "Friend 2", "Friend 3", "Friend 4") // Add your friends here
+val friendsList = listOf("Friend 1", "Friend 2", "Friend 3", "Friend 4") // TODO : remplacer par la liste des amis de l'utilisateur
 
+/**
+ * Génère une playlist en fonction des paramètres donnés.
+ */
 fun generatePlaylist(context : Context, friends: List<String>, maxAcousticness: Float,
                      maxDanceability: Float, maxInstrulmentalness: Float,
                      maxValence: Float, maxSpeechiness: Float) {
@@ -144,23 +148,15 @@ fun generatePlaylist(context : Context, friends: List<String>, maxAcousticness: 
         "max_instrumentalness" to mutableListOf(maxInstrulmentalness.toString()),
         "max_valence" to mutableListOf(maxValence.toString()),
         "max_speechiness" to mutableListOf(maxSpeechiness.toString()),
+        // Il faut gérer la liste des genres musicaux
         "seed_genres" to mutableListOf("pop")
     )
-    println("coucou")
     SpotifyAPI.getGeneratedPlaylistTracks(context, accessToken, refreshToken, parameters) { tracks ->
         println(tracks)
         if (tracks != null) {
-            println("Generated Playlist:")
-            for (i in 0 until tracks.size) {
-                val json = tracks[i]
-                // Afficher le nom de la chanson dans la console pour le moment
-                println("User Recommendation $i :")
-                println(json.get("name"))
-                val album = json.get("album") as JSONObject
-                val imagesArr = album.get("images") as JSONArray
-                val images = imagesArr.get(0) as JSONObject
-                println(images.get("url"))
-            }
+            PlaylistData.savePlaylist(context,tracks)
+            val intent = Intent(context, PlaylistDisplayActivity::class.java)
+            context.startActivity(intent)
         }
     }
 }

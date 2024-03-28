@@ -1,6 +1,7 @@
 package com.tunajam.app.spotify_login
 
 import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import com.google.gson.Gson
 import com.tunajam.app.user_data.UserData
 import okhttp3.*
@@ -26,6 +27,7 @@ class SpotifyAPI {
      */
     fun getUserProfile(
         accessToken: String,
+        context: Context,
         callback: (String?, String?, String?, String?) -> Unit
     ) {
         val request = Request.Builder()
@@ -40,6 +42,7 @@ class SpotifyAPI {
                 val displayName = jsonObject.optString("display_name")
                 val emailUser = jsonObject.optString("email")
                 val idUser = jsonObject.optString("id")
+                UserData.saveUserId(context, idUser)
                 val imgUser = jsonObject.optString("images")
                 callback(displayName, emailUser, idUser, imgUser)
             }
