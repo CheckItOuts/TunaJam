@@ -12,13 +12,13 @@
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TunaJam"
+        android:name=".TunaJamApplication"
         tools:targetApi="31">
 
         <activity
             android:name=".spotify_login.MainActivity"
             android:exported="true"
             android:launchMode="standard"
-            android:label="@string/app_name"
             android:theme="@style/Theme.TunaJam">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,6 +33,16 @@
         </activity>
         <activity
             android:name=".home.HomeActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
+        <activity
+            android:name=".playlist.PlaylistGenerationActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
+        <activity
+            android:name=".playlist.PlaylistDisplayActivity"
             android:exported="true"
             android:launchMode="standard"
             android:theme="@style/Theme.TunaJam" />

@@ -6,12 +6,12 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import com.tunajam.app.data.DefaultAppContainer
 
-class TunaJamApplication : ComponentActivity() {
+class TunaJamApplication : Application() {
     /** AppContainer instance used by the rest of classes to obtain dependencies */
     lateinit var container: AppContainer
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
+    override fun onCreate() {
+        super.onCreate()
+        //enableEdgeToEdge()
         container = DefaultAppContainer()
     }
 }

@@ -33,7 +33,6 @@ import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.theme.TunaJamTheme
 
 
-
 @Composable
 fun HomeScreen(
     tunaJamUiState: TunaJamUiState, retryAction: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -95,10 +94,9 @@ fun ResultScreen(photos: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
-
     //formate les images format carré
+    val context = LocalContext.current
     Card(
-        modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
 
@@ -111,7 +109,7 @@ fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
             placeholder = painterResource(R.drawable.loading_img),
             contentDescription = stringResource(R.string.tunaJam_photo),
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(4.dp)
         )
     }
 }
@@ -121,7 +119,7 @@ fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
 fun PhotosGridScreen(
     photos: List<TunaJamPhoto>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(150.dp),
@@ -139,7 +137,6 @@ fun PhotosGridScreen(
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun LoadingScreenPreview() {
@@ -161,7 +158,7 @@ fun ErrorScreenPreview() {
 fun PhotosGridScreenPreview() {
     TunaJamTheme {
         val mockData = List(10) { TunaJamPhoto("$it", "") }
-        PhotosGridScreen(mockData)
+        PhotosGridScreen(mockData, modifier = Modifier.fillMaxSize())
     }
 }
 
