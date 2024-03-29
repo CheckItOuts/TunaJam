@@ -5,10 +5,10 @@ import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.network.TunaJamApiService
 
 /**
- * Repository that fetch mars photos list from marsApi.
+ * Repository that fetch mars photos list from tunaJamApi.
  */
 interface TunaJamPhotoRepository {
-    /** Fetches list of MarsPhoto from marsApi */
+    /** Fetches list of TunaJam photos from tunaJamApi */
     suspend fun getTunaJamPhotos(): List<TunaJamPhoto>
 }
 

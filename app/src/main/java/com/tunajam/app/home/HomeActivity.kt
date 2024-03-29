@@ -72,29 +72,29 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
-                spotifyAPI.getUserProfile(accessToken,this) { displayName, _, _, _ ->
+                spotifyAPI.getUserProfile(accessToken, this) { displayName, _, _, _ ->
                     val user = User(displayName.toString())
                     val parameters = mutableMapOf("seed_genres" to mutableListOf("rock"))
-                        runOnUiThread {
-                            if (tracks != null) {
-                                for (i in 0 until tracks.size) {
-                                    val json = tracks[i]
-                                    // Afficher le nom de la chanson dans la console pour le moment
-                                    println("User Recommendation $i :")
-                                    println(json.get("name"))
-                                }
+                    runOnUiThread {
+                        if (tracks != null) {
+                            for (i in 0 until tracks.size) {
+                                val json = tracks[i]
+                                // Afficher le nom de la chanson dans la console pour le moment
+                                println("User Recommendation $i :")
+                                println(json.get("name"))
                             }
-                            setContent {
-                                TunaJamTheme {
-                                    val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
-                                    Column {
-                                        TunaJamApp(tunaJamUiState,this@HomeActivity)
-                                    }
+                        }
+                        setContent {
+                            TunaJamTheme {
+                                val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
+                                Column {
+                                    TunaJamApp(tunaJamUiState, this@HomeActivity)
                                 }
                             }
                         }
                     }
                 }
+            }
             }
         }
     }
@@ -152,11 +152,11 @@ class HomeActivity : ComponentActivity() {
                     .fillMaxSize()
                     .padding(top = 65.dp)
             ) {
-                val marsViewModel: TunaJamViewModel =
+                val tunaJamViewModel: TunaJamViewModel =
                     viewModel(factory = TunaJamViewModel.Factory)
                 HomeScreen(
                     tunaJamUiState = tunaJamUiState,
-                    retryAction = marsViewModel::getTunaJamPhotos,
+                    retryAction = tunaJamViewModel::getTunaJamPhotos,
                     contentPadding = it
                 )
 
@@ -202,7 +202,9 @@ fun NavigationButton(
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_round),
                 contentDescription = "App Logo",
-                modifier = Modifier.width(72.dp).height(72.dp)
+                modifier = Modifier
+                    .width(72.dp)
+                    .height(72.dp)
             )
         }
     }
