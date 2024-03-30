@@ -66,9 +66,6 @@ fun HomeScreen(
     }
 }
 
-
-
-
 /**
  * Displays the 3 recommendations of the day panel
  */

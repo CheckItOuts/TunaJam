@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -58,6 +59,7 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
     var maxInstrulmentalness by remember { mutableFloatStateOf(0.5f) }
     var maxValence by remember { mutableFloatStateOf(0.5f) }
     var maxSpeechiness by remember { mutableFloatStateOf(0.5f) }
+    val expanded = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -84,13 +86,26 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                 Text(
                     text = "Ajuste tes paramètres:",
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 15.dp).align(CenterHorizontally)
+                    modifier = Modifier
+                        .padding(bottom = 15.dp)
+                        .align(CenterHorizontally)
                 )
                 ParameterSlider("Acoustique", maxAcousticness) {maxAcousticness = it }
                 ParameterSlider("Dansant", maxDanceability) { maxDanceability = it }
                 ParameterSlider("Instrumental", maxInstrulmentalness ) {maxInstrulmentalness = it }
                 ParameterSlider("Positivité", maxValence) { maxValence = it }
                 ParameterSlider("Paroles", maxSpeechiness ) {maxSpeechiness  = it }
+
+                Text(text = "Genres musicaux :",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 15.dp)
+                )
+                if (expanded.value) {
+                    // TODO : ajouter la liste des genres musicaux
+                    DropdownMenu(expanded = expanded.value, onDismissRequest = { /*TODO*/ }) {
+
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -99,7 +114,9 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                     generatePlaylist(context,selectedFriends, maxAcousticness, maxDanceability,
                         maxInstrulmentalness, maxValence, maxSpeechiness)
                 },
-                    modifier = Modifier.align(CenterHorizontally).padding(top = 16.dp)
+                    modifier = Modifier
+                        .align(CenterHorizontally)
+                        .padding(top = 16.dp)
                 ) {
                     Text("Générer la playlist")
                 }
