@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -34,6 +35,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tunajam.app.R
+import com.tunajam.app.data.PlaylistDirectory
+import com.tunajam.app.data.SongDirectory
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.playlist.PlaylistGenerationActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
@@ -43,6 +46,7 @@ import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamTheme
 import com.tunajam.app.user_data.UserData
 import org.json.JSONArray
+import org.json.JSONObject
 
 
 data class User(val name: String)
@@ -56,15 +60,13 @@ class HomeActivity : ComponentActivity() {
         val playlistPhotos = mutableListOf<TunaJamPhoto>()
         spotifyAPI.getUserPlaylist(this, accessToken, refreshToken) { playlists ->
             if (playlists != null) {
+                PlaylistDirectory.clearPlaylists()
                 for (i in 0 until playlists.size) {
                     val json = playlists[i]
-                    // Afficher le nom de la playlist dans la console pour le moment
-                    println("Playlist $i :")
-                    println(json.get("name"))
                     val urlPlaylist = json.get("uri")
-                    print(urlPlaylist)
                     val imagesArr = json.get("images") as? JSONArray
                     val imageUrl = imagesArr?.optJSONObject(0)?.optString("url")
+                    PlaylistDirectory.addPlaylist(json.get("name").toString(), json.get("id").toString())
                     imageUrl?.let {
                         val photo = TunaJamPhoto("$i", it)
                         playlistPhotos.add(photo)
@@ -72,29 +74,32 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
-                spotifyAPI.getUserProfile(accessToken,this) { displayName, _, _, _ ->
+                spotifyAPI.getUserProfile(accessToken, this) { displayName, _, _, _ ->
                     val user = User(displayName.toString())
-                    val parameters = mutableMapOf("seed_genres" to mutableListOf("rock"))
-                        runOnUiThread {
-                            if (tracks != null) {
-                                for (i in 0 until tracks.size) {
-                                    val json = tracks[i]
-                                    // Afficher le nom de la chanson dans la console pour le moment
-                                    println("User Recommendation $i :")
-                                    println(json.get("name"))
-                                }
+                    runOnUiThread {
+                        SongDirectory.clearSongs()
+                        if (tracks != null) {
+                            for (i in 0 until tracks.size) {
+                                val json = tracks[i]
+                                val album = json.get("album") as JSONObject
+                                val albumJson = album.get("images") as? JSONArray
+                                val imageUrl = albumJson?.optJSONObject(0)?.optString("url")
+                                SongDirectory.addSong(json.get("name").toString(),
+                                    (json.get("artists") as JSONArray).optJSONObject(0)?.optString("name").toString(),
+                                    imageUrl.toString(),json.get("uri").toString())
                             }
-                            setContent {
-                                TunaJamTheme {
-                                    val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
-                                    Column {
-                                        TunaJamApp(tunaJamUiState,this@HomeActivity)
-                                    }
+                        }
+                        setContent {
+                            TunaJamTheme {
+                                val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
+                                Column {
+                                    TunaJamApp(tunaJamUiState, this@HomeActivity)
                                 }
                             }
                         }
                     }
                 }
+            }
             }
         }
     }
@@ -131,41 +136,42 @@ class HomeActivity : ComponentActivity() {
     }
 
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TunaJamApp(tunaJamUiState: TunaJamUiState,context: Context) {
-        val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-        Scaffold(
-            // Je pense que c'est mieux de la laisser fixe
-            //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
-            bottomBar = { NavigationButton(onClick = { navigateToPlaylistGenerationActivity(context) },
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .height(72.dp)
-                    .fillMaxWidth()
-                )
-            }
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    Scaffold(
+        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
+        bottomBar = { NavigationButton(
+                        onClick = { navigateToPlaylistGenerationActivity(context) },
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                            .height(72.dp)
+                            .fillMaxWidth()
+                    )
+                }
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 65.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 65.dp)
-            ) {
-                val marsViewModel: TunaJamViewModel =
+            item {
+                val tunaJamViewModel: TunaJamViewModel =
                     viewModel(factory = TunaJamViewModel.Factory)
                 HomeScreen(
                     tunaJamUiState = tunaJamUiState,
-                    retryAction = marsViewModel::getTunaJamPhotos,
+                    retryAction = tunaJamViewModel::getTunaJamPhotos,
                     contentPadding = it
                 )
-
             }
         }
     }
+}
 
 
-    @OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = Modifier) {
         CenterAlignedTopAppBar(
@@ -202,7 +208,9 @@ fun NavigationButton(
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_round),
                 contentDescription = "App Logo",
-                modifier = Modifier.width(72.dp).height(72.dp)
+                modifier = Modifier
+                    .width(72.dp)
+                    .height(72.dp)
             )
         }
     }
