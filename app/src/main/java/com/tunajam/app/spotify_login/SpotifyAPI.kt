@@ -1,12 +1,16 @@
 package com.tunajam.app.spotify_login
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import com.google.gson.Gson
 import com.tunajam.app.user_data.UserData
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -271,11 +275,11 @@ class SpotifyAPI {
                             }
                             try {
                                 val jsonObject = JSONObject(responseBody)
+                                println(jsonObject.toString())
                                 val res = jsonObject.getJSONArray("tracks")
                                 val recommendations: MutableList<JSONObject> = mutableListOf()
                                 for (i in 0 until res.length()) {
                                     val item = res.getJSONObject(i)
-                                    println(item)
                                     recommendations.add(item)
                                 }
                                 callback(recommendations)
@@ -396,10 +400,10 @@ class SpotifyAPI {
                 override fun onResponse(call: Call, response: Response) {
                     val responseBody = response.body?.string()
                     val jsonObject = JSONObject(responseBody!!)
-                    println(jsonObject.toString())
                     val playlistID = jsonObject.getString("id")
                     val tracks = songs.map { it.getString("uri") }
                     val jsonArray = JSONArray(tracks)
+                    println(jsonArray)
                     val requestBody2 =
                         "{\"uris\":$jsonArray}".toRequestBody("application/json".toMediaTypeOrNull())
 
@@ -495,6 +499,46 @@ class SpotifyAPI {
                     }
                 } else {
                     callback(null)
+                }
+            }
+        })
+    }
+    fun addSongToPlaylist(
+        context: Context,
+        accessToken: String,
+        refreshToken: String,
+        playlistID: String,
+        songUri: String,
+        callback: (Boolean) -> Unit
+    ) {
+        val tracks = JSONArray()
+        tracks.put(songUri)
+        val requestBody2 =
+            "{\"uris\": $tracks}".toRequestBody("application/json".toMediaTypeOrNull())
+        val request = Request.Builder()
+            .url("https://api.spotify.com/v1/playlists/$playlistID/tracks")
+            .addHeader("Authorization", "Bearer $accessToken")
+            .post(requestBody2)
+            .build()
+
+        OkHttpClient().newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                println(response.body?.string())
+                callback(response.isSuccessful)
+            }
+
+                override fun onFailure(call: Call, e: IOException) {
+                if (e is SocketTimeoutException || e is ConnectException) {
+                    refreshAccessToken(context, refreshToken) { newAccessToken ->
+                        if (newAccessToken != null) {
+                            addSongToPlaylist(context, newAccessToken, refreshToken, playlistID, songUri, callback)
+                        } else {
+                            callback(false)
+                        }
+                    }
+                } else {
+                    println(e)
+                    callback(false)
                 }
             }
         })

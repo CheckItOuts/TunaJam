@@ -38,53 +38,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.tunajam.app.R
+import com.tunajam.app.data.Playlist
+import com.tunajam.app.data.PlaylistDirectory
+import com.tunajam.app.data.Song
+import com.tunajam.app.data.SongDirectory
 import com.tunajam.app.model.TunaJamPhoto
+import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamTheme
+import com.tunajam.app.user_data.UserData
 
 
 @Composable
 fun HomeScreen(
     tunaJamUiState: TunaJamUiState, retryAction: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    /*TODO : set up the 3 songs with the syntax SongDirectory.addSong("My First Song", "The First Author", "Axel")
-       and set up the user playlists with the syntax PlaylistDirectory.addPlaylist("RoadTrip", mutableListOf<String>("Axel","Me", "Louison"))
-    */
-    //songs recommendation
+    // Songs recommendation
     LoadSongRecommendationPanel()
-    //user playlists grid
+    // User playlists grid
     when (tunaJamUiState) {
-        is TunaJamUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is TunaJamUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
-        //Load playlist pictures
-        is TunaJamUiState.Success -> PhotosGridScreen(tunaJamUiState.photos, modifier)
-        else -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is TunaJamUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxWidth())
+        is TunaJamUiState.Error -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
+        is TunaJamUiState.Success -> PhotosGridScreen(tunaJamUiState.photos, modifier.fillMaxWidth())
+        else -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
     }
 }
 
-/**
- * Define a data class to represent a song
- */
-data class Song(val title: String, val author: String, val friend: String)
-object SongDirectory {
-    val songs = mutableListOf<Song>()
-    fun addSong(title: String, author: String, friend: String) {
-        val newSong = Song(title, author, friend)
-        songs.add(newSong)
-    }
-}
-//TODO : update the Playlist class (add its content, move the class definition...)
-data class Playlist(val title: String, val contributors: List<String>)
-object PlaylistDirectory {
-    val playlists = mutableListOf<Playlist>()
-    fun addPlaylist(title: String, contributors: List<String>) {
-        val newPlaylist = Playlist(title, contributors)
-        playlists.add(newPlaylist)
-    }
-}
+
+
+
 /**
  * Displays the 3 recommendations of the day panel
  */
@@ -107,10 +91,13 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
     val imageNotListened = painterResource(R.drawable.songfished)
     val imageListened = painterResource(R.drawable.fishescaped)
     val imagePainter = rememberUpdatedState(if (removeSong.value) imageListened else imageNotListened)
-
+    val accessToken = UserData.getAccessToken(LocalContext.current).toString()
+    val refreshToken = UserData.getRefreshToken(LocalContext.current).toString()
+    val spotifyAPI = SpotifyAPI()
+    val context = LocalContext.current
 
     Surface(
-        modifier = modifier//.padding(vertical = 4.dp, horizontal = 4.dp)
+        modifier = modifier.padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
         Box(
             modifier = Modifier
@@ -120,14 +107,22 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
             contentAlignment = Alignment.TopStart, //center
 
         ){
-            Column(modifier = Modifier.padding(bottom = extraPadding), verticalArrangement = Arrangement.Top) {
+            Column(modifier = Modifier
+                .padding(bottom = extraPadding), verticalArrangement = Arrangement.Top) {
                 Image(
                     painter =imagePainter.value,
                     contentDescription = "The fished song illustration",
                     contentScale = ContentScale.Crop,
                 )
                 if (!removeSong.value){
-                    Text(text = "Recommended by "+song.friend, color = Color.Gray,fontSize = 10.sp, lineHeight = 10.sp)
+                    //Text(text = "Recommended by "+song.friend, color = Color.Gray,fontSize = 10.sp, lineHeight = 10.sp)
+                    AsyncImage(model = ImageRequest.Builder(context = LocalContext.current)
+                        .data(song.url)
+                        .crossfade(true)
+                        .build(),
+                        error = painterResource(R.drawable.ic_broken_image),
+                        placeholder = painterResource(R.drawable.loading_img),
+                        contentDescription = stringResource(R.string.tunaJam_photo))
                     Text(text = song.title, modifier=modifier, textAlign = TextAlign.Center)
                     Text(text = song.author, modifier=modifier, textAlign = TextAlign.Center)
 
@@ -152,8 +147,10 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                                 DropdownMenuItem(
                                     text = { Text(playlist.title)},
                                     onClick = {
-                                        //TODO ADD THE SONG :song TO THE PLAYLIST : playlist.title
-                                        removeSong.value = true
+                                        spotifyAPI.addSongToPlaylist(context,accessToken, refreshToken, playlist.id, song.songUri) {
+                                            if (it) removeSong.value = true
+                                        }
+
                                     }
                                 )
                             }
@@ -242,7 +239,9 @@ fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
             placeholder = painterResource(R.drawable.loading_img),
             contentDescription = stringResource(R.string.tunaJam_photo),
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth().padding(4.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
         )
     }
 }
@@ -254,19 +253,24 @@ fun PhotosGridScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(150.dp),
-        modifier = modifier.padding(horizontal = 4.dp),
-        contentPadding = contentPadding,
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
-        items(items = photos, key = { photo -> photo.id }) { photo ->
-            TunaJamPhotoCard(
-                photo,
-                modifier = modifier
-                    .padding(4.dp)
-                    .fillMaxWidth()
-                    .aspectRatio(1.5f)
-            )
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(150.dp),
+            modifier = modifier.padding(horizontal = 4.dp).height(800.dp),
+            contentPadding = contentPadding,
+            ) {
+                items(items = photos, key = { photo -> photo.id }) { photo ->
+                    TunaJamPhotoCard(
+                    photo,
+                    modifier = modifier
+                       .padding(4.dp)
+                       .fillMaxWidth()
+                       .aspectRatio(1.5f)
+                )
+            }
         }
     }
 }
