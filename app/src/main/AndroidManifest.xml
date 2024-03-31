@@ -23,12 +23,8 @@
             android:theme="@style/Theme.TunaJam">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.VIEW"/>
-
-
             </intent-filter>
         </activity>
         <activity
@@ -43,6 +39,11 @@
             android:theme="@style/Theme.TunaJam" />
         <activity
             android:name=".playlist.PlaylistDisplayActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
+        <activity
+            android:name=".friends.FriendsActivity"
             android:exported="true"
             android:launchMode="standard"
             android:theme="@style/Theme.TunaJam" />

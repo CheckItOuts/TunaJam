@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.user_data.PlaylistData
@@ -57,6 +60,7 @@ class PlaylistGenerationActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
+    var expanded = false
     val selectedFriends by remember { mutableStateOf(emptyList<String>()) }
     var maxAcousticness by remember { mutableFloatStateOf(0.5f) }
     var maxDanceability by remember { mutableFloatStateOf(0.5f) }
@@ -103,7 +107,20 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
-                // TODO : ajouter la liste des amis
+                DropdownMenu(
+                    expanded = !expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.align(CenterHorizontally)
+                ) {
+                    for (friend in FriendDirectory.friends) {
+                        DropdownMenuItem(
+                            text = { Text(friend.pseudo)},
+                            onClick = {
+                                //TODO : back pour ajouter l'ami
+                            }
+                        )
+                    }
+                }
                 // Parameter sliders
                 Text(
                     text = "Ajuste tes paramètres:",

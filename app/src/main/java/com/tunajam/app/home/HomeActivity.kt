@@ -112,7 +112,7 @@ class HomeActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = "Accueil") }
+                    title = { Text(text = "Home") }
                 )
             },
             content = {
