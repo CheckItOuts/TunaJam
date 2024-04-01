@@ -35,8 +35,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tunajam.app.R
+import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.data.PlaylistDirectory
 import com.tunajam.app.data.SongDirectory
+import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.playlist.PlaylistGenerationActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
@@ -58,6 +60,8 @@ class HomeActivity : ComponentActivity() {
         val refreshToken = UserData.getRefreshToken(this).toString()
         val spotifyAPI = SpotifyAPI()
         val playlistPhotos = mutableListOf<TunaJamPhoto>()
+        val db = Database()
+        val pseudo = UserData.getUserName(this).toString()
         spotifyAPI.getUserPlaylist(this, accessToken, refreshToken) { playlists ->
             if (playlists != null) {
                 PlaylistDirectory.clearPlaylists()
@@ -73,36 +77,67 @@ class HomeActivity : ComponentActivity() {
                     }
                 }
             }
-            SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
-                spotifyAPI.getUserProfile(accessToken, this) { displayName, _, _, _ ->
-                    val user = User(displayName.toString())
-                    runOnUiThread {
-                        SongDirectory.clearSongs()
-                        if (tracks != null) {
-                            for (i in 0 until tracks.size) {
-                                val json = tracks[i]
-                                val album = json.get("album") as JSONObject
-                                val albumJson = album.get("images") as? JSONArray
-                                val imageUrl = albumJson?.optJSONObject(0)?.optString("url")
-                                SongDirectory.addSong(json.get("name").toString(),
-                                    (json.get("artists") as JSONArray).optJSONObject(0)?.optString("name").toString(),
-                                    imageUrl.toString(),json.get("uri").toString())
-                            }
+            db.addUser("test", "test")
+            db.addUser("test2", "test2")
+            db.addUser("test3", "test3")
+            db.addUser("test4", "test4")
+            db.addUser("test5", "test5")
+            db.addUser("test6", "test6")
+            db.addFriend(pseudo, "test")
+            db.addFriend(pseudo, "test2")
+            db.addFriend(pseudo, "test3")
+            db.addFriend(pseudo, "test4")
+            db.addFriend(pseudo, "test5")
+            db.addFriend(pseudo, "test6")
+
+            db.getFriends(pseudo) {
+                FriendDirectory.clearFriends()
+                it.size
+                for (friend in it) {
+                    db.getUser(friend["friendPseudo"].toString()) { userData ->
+                        if (userData != null) {
+                            val friendName = userData["pseudo"].toString()
+                            val friendPhotoUrl = userData["photo"].toString()
+                            val friendPhoto = TunaJamPhoto(
+                                friendName,
+                                "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg"
+                            )
+                            FriendDirectory.addFriend(friendName, friendName, true, friendPhoto)
                         }
-                        setContent {
-                            TunaJamTheme {
-                                val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
-                                Column {
-                                    TunaJamApp(tunaJamUiState, this@HomeActivity)
-                                }
+                    }
+                }
+            }
+            SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
+                runOnUiThread {
+                    SongDirectory.clearSongs()
+                    if (tracks != null) {
+                        for (i in 0 until tracks.size) {
+                            val json = tracks[i]
+                            val album = json.get("album") as JSONObject
+                            val albumJson = album.get("images") as? JSONArray
+                            val imageUrl = albumJson?.optJSONObject(0)?.optString("url")
+                            SongDirectory.addSong(json.get("name").toString(),
+                                (json.get("artists") as JSONArray).optJSONObject(0)?.optString("name").toString(),
+                                imageUrl.toString(),json.get("uri").toString())
+                            val idSong = json.get("id").toString()
+                            println(idSong)
+                            db.addMusic(pseudo, idSong)
+                        }
+                    }
+                    setContent {
+                        TunaJamTheme {
+                            val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
+                            Column {
+                                TunaJamApp(tunaJamUiState, this@HomeActivity)
                             }
                         }
                     }
                 }
             }
-            }
         }
     }
+}
+
 
 
     @OptIn(ExperimentalMaterial3Api::class)

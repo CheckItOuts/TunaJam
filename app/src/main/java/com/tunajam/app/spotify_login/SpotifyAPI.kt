@@ -48,7 +48,14 @@ class SpotifyAPI {
                 val idUser = jsonObject.optString("id")
                 UserData.saveUserId(context, idUser)
                 val imgUser = jsonObject.optString("images")
-                callback(displayName, emailUser, idUser, imgUser)
+                val imgUserArray = JSONArray(imgUser)
+                if (imgUserArray.length() == 0) {
+                    callback(displayName, emailUser, idUser, null)
+                    return
+                }
+                val imgUserObj = imgUserArray.getJSONObject(0)
+                val imgUserUrl = imgUserObj.optString("url")
+                callback(displayName, emailUser, idUser, imgUserUrl)
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -275,7 +282,6 @@ class SpotifyAPI {
                             }
                             try {
                                 val jsonObject = JSONObject(responseBody)
-                                println(jsonObject.toString())
                                 val res = jsonObject.getJSONArray("tracks")
                                 val recommendations: MutableList<JSONObject> = mutableListOf()
                                 for (i in 0 until res.length()) {
@@ -403,7 +409,6 @@ class SpotifyAPI {
                     val playlistID = jsonObject.getString("id")
                     val tracks = songs.map { it.getString("uri") }
                     val jsonArray = JSONArray(tracks)
-                    println(jsonArray)
                     val requestBody2 =
                         "{\"uris\":$jsonArray}".toRequestBody("application/json".toMediaTypeOrNull())
 
