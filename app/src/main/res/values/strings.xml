@@ -2,4 +2,9 @@
     <string name="app_name">TunaJam</string>
     <string name="button_connexion">Se connecter avec Spotify</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="loading_failed">Failed to load</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading</string>
+    <string name="placeholder_success">Placeholder text</string>
+    <string name="tunaJam_photo">TunaJam photo</string>
 </resources>
