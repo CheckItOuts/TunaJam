@@ -6,6 +6,7 @@ import com.google.firebase.firestore.firestore
 import com.tunajam.app.firebase.Database as Database
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,8 +46,32 @@ fun testButton() {
         db.addUser("Axel", "test")
         db.addFriend("Louison", "Axel")
         db.addFriend("Louison", "test")
-        db.getUser("Louison")
-        db.getFriends("Louison")
+        db.addMusic("Louison", "142563326")
+        db.addMusic("Louison", "645946164")
+        db.addMusic("Louison", "98613")
+        db.getUser("Louison") { userData ->
+            if (userData != null) {
+                Log.d("", userData.toString())
+            } else {
+                Log.d("Problème user", "null")
+            }
+        }
+        db.getFriends("Louison") { friendsData ->
+            if (friendsData.isNotEmpty()) {
+                Log.d("", friendsData.toString())
+            } else {
+                Log.d("Problème amis", "null")
+            }
+        }
+        db.getLastMusic("Louison") { lastMusicData ->
+            if (lastMusicData != null) {
+                Log.d("", lastMusicData.toString())
+            } else {
+                Log.d("Problème music", "null")
+            }
+        }
+
+
     }) {
         Text(text = "Click Me")
     }
