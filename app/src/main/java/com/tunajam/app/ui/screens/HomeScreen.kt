@@ -1,5 +1,6 @@
 package com.tunajam.app.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,7 @@ import com.tunajam.app.data.Playlist
 import com.tunajam.app.data.PlaylistDirectory
 import com.tunajam.app.data.Song
 import com.tunajam.app.data.SongDirectory
+import com.tunajam.app.friends.FriendsActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamTheme
@@ -55,8 +57,15 @@ import com.tunajam.app.user_data.UserData
 fun HomeScreen(
     tunaJamUiState: TunaJamUiState, retryAction: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
+    val context = LocalContext.current
     // Songs recommendation
     LoadSongRecommendationPanel()
+    Button(onClick = {
+        val intent = Intent(context, FriendsActivity::class.java)
+        context.startActivity(intent)
+    }) {
+        Text(text = "Aller à la page des amis")
+    }
     // User playlists grid
     when (tunaJamUiState) {
         is TunaJamUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxWidth())
@@ -256,16 +265,18 @@ fun PhotosGridScreen(
     ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(150.dp),
-            modifier = modifier.padding(horizontal = 4.dp).height(800.dp),
+            modifier = modifier
+                .padding(horizontal = 4.dp)
+                .height(800.dp),
             contentPadding = contentPadding,
             ) {
                 items(items = photos, key = { photo -> photo.id }) { photo ->
                     TunaJamPhotoCard(
                     photo,
                     modifier = modifier
-                       .padding(4.dp)
-                       .fillMaxWidth()
-                       .aspectRatio(1.5f)
+                        .padding(4.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(1.5f)
                 )
             }
         }

@@ -32,20 +32,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tunajam.app.R
-import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.playlist.PlaylistGenerationActivity
-import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.screens.FriendScreen
-import com.tunajam.app.ui.screens.HomeScreen
 import com.tunajam.app.ui.screens.TunaJamUiState
 import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamTheme
-import com.tunajam.app.user_data.UserData
 
 
 data class User(val name: String)
@@ -53,31 +48,18 @@ data class User(val name: String)
 class FriendsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val accessToken = UserData.getAccessToken(this).toString()
-        val refreshToken = UserData.getRefreshToken(this).toString()
-        val spotifyAPI = SpotifyAPI()
-        val friendsPhotos = mutableListOf<TunaJamPhoto>()
-        //TODO: spotifyAPI.getFriendsInfos(this, accessToken, refreshToken) {}
-        //TODO:
-        val friendPictureUrl = ""
-        SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
-            spotifyAPI.getUserProfile(accessToken, this) { displayName, _, _, _ ->
-                val user = User(displayName.toString())
-                runOnUiThread {
-                    FriendDirectory.clearFriends()
-                    setContent {
-                        TunaJamTheme {
-                            val tunaJamUiState = TunaJamUiState.Success(friendsPhotos)
-                            Column {
-                                TunaJamApp(this@FriendsActivity)
-                            }
+            runOnUiThread {
+                setContent {
+                    TunaJamTheme {
+                        //val tunaJamUiState = TunaJamUiState.Success(friendsPhotos)
+                        Column {
+                            TunaJamApp(this@FriendsActivity)
                         }
                     }
                 }
             }
         }
     }
-}
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

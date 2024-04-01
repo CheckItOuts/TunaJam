@@ -1,12 +1,8 @@
 package com.tunajam.app.firebase
 
-import androidx.activity.ComponentActivity
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.tunajam.app.firebase.Database as Database
-
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.tunajam.app.firebase.Database
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +65,14 @@ fun testButton() {
                 Log.d("", lastMusicData.toString())
             } else {
                 Log.d("Problème music", "null")
+            }
+        }
+        db.getUsers(){usersData ->
+            if (usersData != null) {
+                Log.d("", usersData.toString())
+            }
+            else{
+                Log.d("Problem all users", "null")
             }
         }
 

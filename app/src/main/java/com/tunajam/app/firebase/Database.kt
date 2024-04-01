@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import org.json.JSONObject.NULL
-import java.util.Objects
 
 const val TAG = "Database class file"
 class Database {
@@ -17,14 +16,14 @@ class Database {
      * Ajouter un utilisateur à la collection users
      *
      * @param pseudo Pseudo de l'utilisateur à ajouter
-     * @param mdp Mot de passe de l'utilisateur
+     * @param photo URL de la photo de l'utilisateur
      *
      * @return None
      */
-    fun addUser(pseudo : String, mdp : String): Int {
+    fun addUser(pseudo : String, photo : String): Int {
         val user = hashMapOf(
             "pseudo" to pseudo,
-            "mdp" to mdp
+            "photo" to photo
         )
 
         db.collection("users").document(pseudo)
@@ -129,6 +128,27 @@ class Database {
     }
 
     /**
+     * Récupérer toutes données de tous les utilisateurs
+     *
+     * @return Liste de tous les utilisateurs
+     */
+    fun getUsers(callback: (List<Map<String, Any>>) -> Unit) {
+        db.collection("users")
+            .get()
+            .addOnSuccessListener { documents ->
+                val friendsList = mutableListOf<Map<String, Any>>()
+                for (document in documents) {
+                    friendsList.add(document.data)
+                }
+                callback(friendsList)
+            }
+            .addOnFailureListener { e ->
+                Log.d(TAG, "Error getting documents: ", e)
+                callback(emptyList()) // Retourner une liste vide en cas d'échec
+            }
+    }
+
+    /**
      * Récupérer la dernière musique d'un utilisateur
      *
      * @param pseudo Pseudo de l'utilisateur
@@ -139,18 +159,11 @@ class Database {
         db.collection("users").document(pseudo).collection("musics")
             .get()
             .addOnSuccessListener { documents ->
-                var lastMusic: Map<String, Any>? = null
-                for (document in documents) {
-                    lastMusic = document.data
-                }
-                callback(lastMusic)
+                callback(documents.first().data)
             }
             .addOnFailureListener { e ->
                 Log.d(TAG, "Error getting documents: ", e)
                 callback(null) // Retourner null en cas d'échec
             }
     }
-
 }
-
-
