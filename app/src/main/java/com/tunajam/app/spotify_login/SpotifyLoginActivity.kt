@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import com.tunajam.app.firebase.Database
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.MainActivity.Companion.authenticateWithSpotify
 import com.tunajam.app.user_data.UserData
@@ -47,6 +48,12 @@ class MainActivity : ComponentActivity() {
      * Elle permet de naviguer vers l'activité principale de l'application.
      */
     private fun navigateToHome(accessToken: String, refreshToken: String) {
+        val db = Database()
+        val spotifyAPI = SpotifyAPI()
+        spotifyAPI.getUserProfile(accessToken, this@MainActivity){displayName,_,_,imgUsrUrl ->
+            UserData.saveUserName(this, displayName.toString()) // On sauvegarde le nom de l'utilisateur
+            db.addUser(displayName.toString(), imgUsrUrl.toString()) // On ajoute l'utilisateur à la base de données
+        }
         UserData.saveTokens(this, accessToken, refreshToken) // On sauvegarde les tokens
         // On navigue vers l'activité principale
         val intent = Intent(this, HomeActivity::class.java)

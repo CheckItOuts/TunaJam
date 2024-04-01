@@ -40,15 +40,15 @@ class TunaJamViewModel(private val tunaJamPhotoRepository: TunaJamPhotoRepositor
         private set
 
     /**
-     * Call getMarsPhotos() on init so we can display status immediately.
+     * Call getTunaJamPhotos() on init so we can display status immediately.
      */
     init {
         getTunaJamPhotos()
     }
 
     /**
-     * Gets Mars photos information from the Mars API Retrofit service and updates the
-     * [MarsPhoto] [List] [MutableList].
+     * Gets TunaJam photos information from the Mars API Retrofit service and updates the
+     * [TunaJam] [List] [MutableList].
      */
     fun getTunaJamPhotos() {
         viewModelScope.launch {

@@ -27,6 +27,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.tunajam.app.data.FriendDirectory
+import com.tunajam.app.firebase.Database
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.user_data.PlaylistData
@@ -57,7 +60,9 @@ class PlaylistGenerationActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
-    val selectedFriends by remember { mutableStateOf(emptyList<String>()) }
+    var expanded = false
+    val friendsList = FriendDirectory.friends.map { it.pseudo }
+    var selectedFriends by remember { mutableStateOf(emptyList<String>()) }
     var maxAcousticness by remember { mutableFloatStateOf(0.5f) }
     var maxDanceability by remember { mutableFloatStateOf(0.5f) }
     var maxInstrulmentalness by remember { mutableFloatStateOf(0.5f) }
@@ -99,11 +104,20 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
             ) {
                 // Friend selection
                 Text(
-                    text = "Sélectionne tes amis :",
+                    text = "Sélectionne tes amis : (5 maximums)",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
-                // TODO : ajouter la liste des amis
+                FriendSelection(
+                    friendsList = friendsList,
+                    selectedFriends = selectedFriends,
+                    onFriendSelected = { friend ->
+                        selectedFriends = selectedFriends.toMutableList().apply { add(friend) }
+                    },
+                    onFriendUnselected = { friend ->
+                        selectedFriends = selectedFriends.filter { it != friend }
+                    }
+                )
                 // Parameter sliders
                 Text(
                     text = "Ajuste tes paramètres:",
@@ -185,14 +199,26 @@ fun generatePlaylist(context : Context, friends: List<String>, maxAcousticness: 
     val accessToken = UserData.getAccessToken(context).toString()
     val refreshToken = UserData.getRefreshToken(context).toString()
     val genres = selectedGenres.toMutableList()
+    val friendsList = friends.toMutableList()
+    val seedMusic = mutableListOf<String>()
+    val db = Database()
+
+    for (friend in friendsList) {
+        db.getLastMusic(friend) { music ->
+           if (music != null) {
+                seedMusic.add(music["id"].toString())
+           }
+       }
+    }
+
     val parameters = mutableMapOf(
         "max_acousticness" to mutableListOf(maxAcousticness.toString()),
         "max_danceability" to mutableListOf(maxDanceability.toString()),
         "max_instrumentalness" to mutableListOf(maxInstrulmentalness.toString()),
         "max_valence" to mutableListOf(maxValence.toString()),
         "max_speechiness" to mutableListOf(maxSpeechiness.toString()),
-        // Il faut gérer la liste des genres musicaux
-        "seed_genres" to genres
+        "seed_genres" to genres,
+        "seed_tracks" to seedMusic
     )
     SpotifyAPI.getGeneratedPlaylistTracks(context, accessToken, refreshToken, parameters) { tracks ->
         println(tracks)
@@ -241,6 +267,56 @@ fun GenreSelection(
         }
 
         if (!expanded && genresList.size > 5) { // Change 5 to the desired threshold for expansion
+            TextButton(onClick = { expanded = true }) {
+                Text("Show More")
+            }
+        } else if (expanded) {
+            TextButton(onClick = { expanded = false }) {
+                Text("Show Less")
+            }
+        }
+    }
+}
+@Composable
+fun FriendSelection(
+    friendsList: List<String>,
+    selectedFriends: List<String>,
+    onFriendSelected: (String) -> Unit,
+    onFriendUnselected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCount by remember { mutableIntStateOf(selectedFriends.size) }
+
+    Column {
+        val visibleGenres = if (expanded) friendsList else friendsList.take(5)
+        visibleGenres.forEach { genre ->
+            val isChecked = selectedFriends.contains(genre)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 4.dp)
+            ) {
+                Checkbox(
+                    checked = isChecked,
+                    enabled = !isChecked || selectedCount > 1,
+                    onCheckedChange = { isChecked ->
+                        if (selectedCount < 5) {
+                            onFriendSelected(genre)
+                            selectedCount++
+                        } else {
+                            onFriendUnselected(genre)
+                            selectedCount--
+                        }
+                    }
+                )
+                Text(
+                    text = genre.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+
+        if (!expanded && friendsList.size > 5) {
             TextButton(onClick = { expanded = true }) {
                 Text("Show More")
             }

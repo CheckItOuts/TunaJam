@@ -6,6 +6,7 @@ object UserData {
     private const val ACCESS_TOKEN = "accessToken"
     private const val REFRESH_TOKEN = "refreshToken"
     private const val USER_ID = "userId"
+    private const val USER_NAME = "userName"
 
     fun saveTokens(context: Context, accessToken: String, refresToken: String) {
         // On sauvegarde le token dans les préférences partagées
@@ -26,6 +27,15 @@ object UserData {
         }
     }
 
+    fun saveUserName(context: Context, userName: String) {
+        // On sauvegarde le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString(USER_NAME, userName)
+            apply()
+        }
+    }
+
     fun getAccessToken(context: Context): String? {
         // On récupère le token dans les préférences partagées
         val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
@@ -42,5 +52,11 @@ object UserData {
         // On récupère le token dans les préférences partagées
         val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
         return sharedPref.getString(USER_ID, null)
+    }
+
+    fun getUserName(context: Context): String? {
+        // On récupère le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        return sharedPref.getString(USER_NAME, null)
     }
 }
