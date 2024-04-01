@@ -70,6 +70,14 @@ fun testButton() {
                 Log.d("Problème music", "null")
             }
         }
+        db.getUsers(){usersData ->
+            if (usersData != null) {
+                Log.d("", usersData.toString())
+            }
+            else{
+                Log.d("Problem all users", "null")
+            }
+        }
 
 
     }) {
