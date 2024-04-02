@@ -17,8 +17,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,11 +45,11 @@ import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.playlist.PlaylistGenerationActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.screens.FriendScreen
-import com.tunajam.app.ui.screens.HomeScreen
 import com.tunajam.app.ui.screens.TunaJamUiState
 import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamTheme
 import com.tunajam.app.user_data.UserData
+import com.tunajam.app.friends.AddFriendActivity
 
 
 data class User(val name: String)
@@ -87,7 +91,9 @@ fun UserInfo(user: User) {
             TopAppBar(
                 title = { Text(text = "Friends") }
             )
+
         },
+
         content = {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -117,6 +123,7 @@ fun TunaJamApp(context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
+        floatingActionButton = {AddFriendFloatingActionButton({navigateToAddFriendActivity(context)}, modifier = Modifier)},
         bottomBar = {
             NavigationButton(
                 onClick = { navigateToPlaylistGenerationActivity(context) },
@@ -161,8 +168,32 @@ fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddFriendFloatingActionButton(onClick: () -> Unit, modifier: Modifier){
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        FloatingActionButton(
+            onClick = onClick,
+            modifier = Modifier
+                .padding(bottom = 16.dp) // Adjust the bottom padding as needed
+                .fillMaxWidth()
+        ) {
+            androidx.compose.material3.Icon(Icons.Default.Add, contentDescription = "Add")
+        }
+    }
+}
+
 fun navigateToPlaylistGenerationActivity(context: Context) {
     val intent = Intent(context, PlaylistGenerationActivity::class.java)
+    context.startActivity(intent)
+}
+
+fun navigateToAddFriendActivity(context: Context){
+    val intent = Intent(context, AddFriendActivity::class.java)
     context.startActivity(intent)
 }
 
