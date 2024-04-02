@@ -77,19 +77,7 @@ class HomeActivity : ComponentActivity() {
                     }
                 }
             }
-            db.addUser("test", "test")
-            db.addUser("test2", "test2")
-            db.addUser("test3", "test3")
-            db.addUser("test4", "test4")
-            db.addUser("test5", "test5")
-            db.addUser("test6", "test6")
-            db.addFriend(pseudo, "test")
-            db.addFriend(pseudo, "test2")
-            db.addFriend(pseudo, "test3")
-            db.addFriend(pseudo, "test4")
-            db.addFriend(pseudo, "test5")
-            db.addFriend(pseudo, "test6")
-
+            db.addUser("test8", "test8")
             db.getFriends(pseudo) {
                 FriendDirectory.clearFriends()
                 it.size
