@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -60,7 +61,6 @@ class PlaylistGenerationActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
-    var expanded = false
     val friendsList = FriendDirectory.friends.map { it.pseudo }
     var selectedFriends by remember { mutableStateOf(emptyList<String>()) }
     var maxAcousticness by remember { mutableFloatStateOf(0.5f) }
@@ -151,10 +151,25 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Generate playlist button
-                Button(onClick = {
-                    generatePlaylist(context,selectedFriends, maxAcousticness, maxDanceability,
-                        maxInstrulmentalness, maxValence, maxSpeechiness,selectedGenres)
-                },
+                Button(
+                    onClick = {
+                        if (selectedGenres.isNotEmpty() && selectedFriends.size in 0..5) {
+                            generatePlaylist(
+                                context,
+                                selectedFriends,
+                                maxAcousticness,
+                                maxDanceability,
+                                maxInstrulmentalness,
+                                maxValence,
+                                maxSpeechiness,
+                                selectedGenres
+                            )
+                        } else {
+                            // Afficher un message d'erreur à l'utilisateur
+                            // Cela pourrait être un Toast, un Snackbar ou toute autre méthode que vous préférez
+                            Toast.makeText(context, "Sélectionnez au moins 1 genre et entre 0 et 5 amis.", Toast.LENGTH_SHORT).show()
+                        }
+                    },
                     modifier = Modifier
                         .align(CenterHorizontally)
                         .padding(top = 16.dp)
