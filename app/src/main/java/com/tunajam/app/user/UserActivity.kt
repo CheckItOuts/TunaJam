@@ -43,7 +43,7 @@ import com.tunajam.app.R
 import com.tunajam.app.friends.AddFriendFloatingActionButton
 import com.tunajam.app.friends.NavigationButton
 import com.tunajam.app.friends.navigateToAddFriendActivity
-import com.tunajam.app.friends.navigateToPlaylistGenerationActivity
+import com.tunajam.app.home.navigateToPlaylistGenerationActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.TunaJamTopAppBar
 import com.tunajam.app.ui.screens.TunaJamViewModel

@@ -109,12 +109,11 @@ fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
                 ElevatedButton(
                     onClick = {
                         deleteFriend.value = !deleteFriend.value
-                        FriendDirectory.removeFriend(friend)
                         db.deleteFriend(pseudo, friend.pseudo)
                     },
 
                     ) {
-                    Text("remove")
+                    Text("Supprimer")
                 }
             }
         }
