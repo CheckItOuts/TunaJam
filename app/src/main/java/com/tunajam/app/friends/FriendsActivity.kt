@@ -6,10 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,25 +16,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tunajam.app.R
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.model.TunaJamPhoto
+import com.tunajam.app.ui.TunaJamTopAppBar
 import com.tunajam.app.ui.screens.FriendScreen
 import com.tunajam.app.ui.screens.TunaJamUiState
 import com.tunajam.app.ui.screens.TunaJamViewModel
@@ -51,7 +43,7 @@ class FriendsActivity : ComponentActivity() {
             runOnUiThread {
                 setContent {
                     TunaJamTheme {
-                        //val tunaJamUiState = TunaJamUiState.Success(friendsPhotos)
+
                         Column {
                             TunaJamApp(this@FriendsActivity)
                         }
@@ -60,37 +52,6 @@ class FriendsActivity : ComponentActivity() {
             }
         }
     }
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun UserInfo(user: User) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Friends") }
-            )
-
-        },
-
-        content = {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "Nom: ${user.name}")
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Display other user information as needed
-                }
-            }
-        }
-    )
-}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +61,7 @@ fun TunaJamApp(context: Context) {
     val tunaJamUiState = TunaJamUiState.Success(friendsPhotos)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
+        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
         floatingActionButton = {AddFriendFloatingActionButton({navigateToAddFriendActivity(context)}, modifier = Modifier)},
         bottomBar = {
             NavigationButton(
@@ -130,21 +91,6 @@ fun TunaJamApp(context: Context) {
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = Modifier) {
-    CenterAlignedTopAppBar(
-        scrollBehavior = scrollBehavior,
-        title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        },
-        modifier = modifier
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

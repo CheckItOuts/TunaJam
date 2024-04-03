@@ -17,21 +17,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tunajam.app.R
@@ -42,6 +38,7 @@ import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.playlist.PlaylistGenerationActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.ui.TunaJamTopAppBar
 import com.tunajam.app.ui.screens.HomeScreen
 import com.tunajam.app.ui.screens.TunaJamUiState
 import com.tunajam.app.ui.screens.TunaJamViewModel
@@ -77,7 +74,7 @@ class HomeActivity : ComponentActivity() {
                     }
                 }
             }
-            db.addUser("test8", "test8")
+
             db.getFriends(pseudo) {
                 FriendDirectory.clearFriends()
                 it.size
@@ -165,7 +162,7 @@ class HomeActivity : ComponentActivity() {
 fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
+        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
         bottomBar = { NavigationButton(
                         onClick = { navigateToPlaylistGenerationActivity(context) },
                         modifier = Modifier
@@ -194,20 +191,6 @@ fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = Modifier) {
-        CenterAlignedTopAppBar(
-            scrollBehavior = scrollBehavior,
-            title = {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-            },
-            modifier = modifier
-        )
-    }
 fun navigateToPlaylistGenerationActivity(context: Context) {
     val intent = Intent(context, PlaylistGenerationActivity::class.java)
     context.startActivity(intent)

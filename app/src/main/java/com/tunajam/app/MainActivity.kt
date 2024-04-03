@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    TunaJamApp()
+                    TunaJamApp(context = this@MainActivity)
                 }
             }
         }

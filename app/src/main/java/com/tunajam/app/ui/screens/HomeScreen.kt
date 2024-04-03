@@ -1,6 +1,5 @@
 package com.tunajam.app.ui.screens
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,7 +45,6 @@ import com.tunajam.app.data.Playlist
 import com.tunajam.app.data.PlaylistDirectory
 import com.tunajam.app.data.Song
 import com.tunajam.app.data.SongDirectory
-import com.tunajam.app.friends.FriendsActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamTheme
@@ -57,15 +55,8 @@ import com.tunajam.app.user_data.UserData
 fun HomeScreen(
     tunaJamUiState: TunaJamUiState, retryAction: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    val context = LocalContext.current
     // Songs recommendation
     LoadSongRecommendationPanel()
-    Button(onClick = {
-        val intent = Intent(context, FriendsActivity::class.java)
-        context.startActivity(intent)
-    }) {
-        Text(text = "Aller à la page des amis")
-    }
     // User playlists grid
     when (tunaJamUiState) {
         is TunaJamUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxWidth())
@@ -140,7 +131,7 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         modifier = Modifier.align(Alignment.CenterHorizontally),
 
                         ) {
-                        Text(if (expanded.value) "Adding "+song.title else "Add to a playlist...")
+                        Text(if (expanded.value) "Ajouter "+song.title else "Ajouter à une playlist...")
                     }
                     //select a playlist
                     if (expanded.value) {
@@ -172,8 +163,8 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         colors = ButtonDefaults.buttonColors(Color.Red)
                     ) {
                         Text(if (!removeSong.value)
-                            "Not for me!"
-                        else "Noted")
+                            "Pas pour moi !"
+                        else "Noté")
                     }
                 }
 
