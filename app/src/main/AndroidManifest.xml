@@ -47,6 +47,11 @@
             android:exported="true"
             android:launchMode="standard"
             android:theme="@style/Theme.TunaJam" />
+        <activity
+            android:name=".user.UserActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:theme="@style/Theme.TunaJam" />
 
     </application>
 

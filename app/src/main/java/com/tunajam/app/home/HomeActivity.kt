@@ -42,6 +42,7 @@ import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.playlist.PlaylistGenerationActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.ui.TunaJamTopAppBar
 import com.tunajam.app.ui.screens.HomeScreen
 import com.tunajam.app.ui.screens.TunaJamUiState
 import com.tunajam.app.ui.screens.TunaJamViewModel
@@ -177,7 +178,7 @@ class HomeActivity : ComponentActivity() {
 fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
+        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
         bottomBar = { NavigationButton(
                         onClick = { navigateToPlaylistGenerationActivity(context) },
                         modifier = Modifier
@@ -206,20 +207,6 @@ fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = Modifier) {
-        CenterAlignedTopAppBar(
-            scrollBehavior = scrollBehavior,
-            title = {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-            },
-            modifier = modifier
-        )
-    }
 fun navigateToPlaylistGenerationActivity(context: Context) {
     val intent = Intent(context, PlaylistGenerationActivity::class.java)
     context.startActivity(intent)
