@@ -60,11 +60,13 @@ fun HomeScreen(
     val context = LocalContext.current
     // Songs recommendation
     LoadSongRecommendationPanel()
-    Button(onClick = {
-        val intent = Intent(context, FriendsActivity::class.java)
-        context.startActivity(intent)
-    }) {
-        Text(text = "Aller à la page des amis")
+    Row {
+        Button(onClick = {
+            val intent = Intent(context, FriendsActivity::class.java)
+            context.startActivity(intent)
+        }) {
+            Text(text = "Aller à la page des amis")
+        }
     }
     // User playlists grid
     when (tunaJamUiState) {

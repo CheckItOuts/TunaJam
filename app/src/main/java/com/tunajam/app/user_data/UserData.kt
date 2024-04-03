@@ -7,6 +7,8 @@ object UserData {
     private const val REFRESH_TOKEN = "refreshToken"
     private const val USER_ID = "userId"
     private const val USER_NAME = "userName"
+    private const val USER_EMAIL = "userEmail"
+    private const val USER_IMG_URL = "userImgUrl"
 
     fun saveTokens(context: Context, accessToken: String, refresToken: String) {
         // On sauvegarde le token dans les préférences partagées
@@ -36,6 +38,24 @@ object UserData {
         }
     }
 
+    fun saveUserEmail(context: Context, userEmail: String) {
+        // On sauvegarde le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString(USER_EMAIL, userEmail)
+            apply()
+        }
+    }
+
+    fun saveUserImgUrl(context: Context, userImgUrl: String) {
+        // On sauvegarde le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString(USER_IMG_URL, userImgUrl)
+            apply()
+        }
+    }
+
     fun getAccessToken(context: Context): String? {
         // On récupère le token dans les préférences partagées
         val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
@@ -58,5 +78,17 @@ object UserData {
         // On récupère le token dans les préférences partagées
         val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
         return sharedPref.getString(USER_NAME, null)
+    }
+
+    fun getUserEmail(context: Context): String? {
+        // On récupère le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        return sharedPref.getString(USER_EMAIL, null)
+    }
+
+    fun getUserImgUrl(context: Context): String? {
+        // On récupère le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        return sharedPref.getString(USER_IMG_URL, null)
     }
 }

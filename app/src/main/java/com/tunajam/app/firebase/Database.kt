@@ -1,9 +1,12 @@
+
 package com.tunajam.app.firebase
 
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import org.json.JSONObject.NULL
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Query
 
 const val TAG = "Database class file"
 class Database {
@@ -62,12 +65,13 @@ class Database {
      * @return None
      */
     fun addMusic(pseudo : String, idMusic : String){
-        val friend = hashMapOf(
-            "id" to idMusic
+        val music = hashMapOf(
+            "id" to idMusic,
+            "time" to Timestamp.now()
         )
 
         db.collection("users").document(pseudo).collection("musics").document(idMusic)
-            .set(friend)
+            .set(music)
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
             .addOnFailureListener { e->Log.d(TAG, "Error writing document", e) }
     }
@@ -157,13 +161,27 @@ class Database {
      */
     fun getLastMusic(pseudo: String, callback: (Map<String, Any>?) -> Unit) {
         db.collection("users").document(pseudo).collection("musics")
+            .orderBy("time", Query.Direction.DESCENDING) // Trie par ordre décroissant de la date ajoutée
+            .limit(1) // Limite les résultats à 1 pour obtenir uniquement la dernière musique ajoutée
             .get()
             .addOnSuccessListener { documents ->
-                callback(documents.first().data)
+                var lastMusic: Map<String, Any>? = null
+                for (document in documents) {
+                    lastMusic = document.data
+                }
+                callback(lastMusic)
             }
             .addOnFailureListener { e ->
                 Log.d(TAG, "Error getting documents: ", e)
                 callback(null) // Retourner null en cas d'échec
             }
+    }
+
+
+    fun deleteFriend(userPseudo: String, friendPseudo: String){
+        db.collection("users").document(userPseudo).collection("friends").document(friendPseudo)
+            .delete()
+            .addOnSuccessListener { Log.d(TAG, "$friendPseudo Supprimé de la liste d'amis de $userPseudo") }
+            .addOnFailureListener { e ->  Log.w(TAG, "Error deleting docuemnt", e)}
     }
 }

@@ -36,7 +36,9 @@ import coil.request.ImageRequest
 import com.tunajam.app.R
 import com.tunajam.app.data.Friend
 import com.tunajam.app.data.FriendDirectory
+import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
+import com.tunajam.app.user_data.UserData
 
 /**
  * Fetch les infos des friends depuis l'API Spotify
@@ -52,7 +54,6 @@ fun FriendScreen(
     when (tunaJamUiState) {
         is TunaJamUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxWidth())
         is TunaJamUiState.Error -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
-        //TODO : à modifier pour récupérer les bonnes infos
         is TunaJamUiState.Success -> PhotosColumnScreen(FriendDirectory.friends, tunaJamUiState.photos, modifier.fillMaxWidth())
         else -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
     }
@@ -62,6 +63,8 @@ fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val deleteFriend = remember { mutableStateOf(false)}
     val photo = friend.picture
+    val pseudo = UserData.getUserName(context).toString()
+    val db = Database()
 
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -106,6 +109,8 @@ fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
                 ElevatedButton(
                     onClick = {
                         deleteFriend.value = !deleteFriend.value
+                        FriendDirectory.removeFriend(friend)
+                        db.deleteFriend(pseudo, friend.pseudo)
                     },
 
                     ) {

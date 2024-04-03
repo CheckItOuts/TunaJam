@@ -51,7 +51,7 @@ class FriendsActivity : ComponentActivity() {
             runOnUiThread {
                 setContent {
                     TunaJamTheme {
-                        //val tunaJamUiState = TunaJamUiState.Success(friendsPhotos)
+
                         Column {
                             TunaJamApp(this@FriendsActivity)
                         }
@@ -60,37 +60,6 @@ class FriendsActivity : ComponentActivity() {
             }
         }
     }
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun UserInfo(user: User) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Friends") }
-            )
-
-        },
-
-        content = {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = "Nom: ${user.name}")
-                    Spacer(modifier = Modifier.height(16.dp))
-                    // Display other user information as needed
-                }
-            }
-        }
-    )
-}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +69,7 @@ fun TunaJamApp(context: Context) {
     val tunaJamUiState = TunaJamUiState.Success(friendsPhotos)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior) },
+        topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
         floatingActionButton = {AddFriendFloatingActionButton({navigateToAddFriendActivity(context)}, modifier = Modifier)},
         bottomBar = {
             NavigationButton(
@@ -130,21 +99,6 @@ fun TunaJamApp(context: Context) {
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, modifier: Modifier = Modifier) {
-    CenterAlignedTopAppBar(
-        scrollBehavior = scrollBehavior,
-        title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        },
-        modifier = modifier
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

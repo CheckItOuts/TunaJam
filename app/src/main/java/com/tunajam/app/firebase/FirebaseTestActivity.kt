@@ -43,9 +43,9 @@ fun testButton() {
         db.addUser("Axel", "test")
         db.addFriend("Louison", "Axel")
         db.addFriend("Louison", "test")
-        db.addMusic("Louison", "142563326")
-        db.addMusic("Louison", "645946164")
-        db.addMusic("Louison", "98613")
+        db.addMusic("Louison", "789")
+        db.addMusic("Louison", "456")
+        db.addMusic("Louison", "123")
         db.getUser("Louison") { userData ->
             if (userData != null) {
                 Log.d("", userData.toString())
@@ -68,11 +68,19 @@ fun testButton() {
             }
         }
         db.getUsers(){usersData ->
-            if (usersData != null) {
+            if (usersData.isNotEmpty()) {
                 Log.d("", usersData.toString())
             }
             else{
                 Log.d("Problem all users", "null")
+            }
+        }
+        db.deleteFriend("Louison", "test")
+        db.getFriends("Louison") { friendsData ->
+            if (friendsData.isNotEmpty()) {
+                Log.d("", friendsData.toString())
+            } else {
+                Log.d("Problème amis", "null")
             }
         }
 
