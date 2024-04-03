@@ -131,7 +131,7 @@ fun PhotosColumnScreen(
 ) {
     println("Friends : $friends")
     LazyColumn(
-        modifier = modifier.padding(horizontal = 4.dp).height(800.dp),
+        modifier = modifier.padding(horizontal = 4.dp).height(630.dp),
         contentPadding = contentPadding,
     ) {
         items(items = friends, key = { friend -> friend.id }) { friend ->

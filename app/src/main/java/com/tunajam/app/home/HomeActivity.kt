@@ -74,6 +74,7 @@ class HomeActivity : ComponentActivity() {
                     }
                 }
             }
+
             db.getFriends(pseudo) {
                 FriendDirectory.clearFriends()
                 it.size
