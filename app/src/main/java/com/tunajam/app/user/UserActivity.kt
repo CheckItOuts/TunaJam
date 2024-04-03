@@ -43,6 +43,7 @@ import com.tunajam.app.R
 import com.tunajam.app.friends.AddFriendFloatingActionButton
 import com.tunajam.app.friends.NavigationButton
 import com.tunajam.app.friends.navigateToAddFriendActivity
+import com.tunajam.app.friends.navigateToHomeActivity
 import com.tunajam.app.home.navigateToPlaylistGenerationActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.TunaJamTopAppBar
@@ -175,10 +176,9 @@ fun ActivityLayout(context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
-        floatingActionButton = { AddFriendFloatingActionButton({ navigateToAddFriendActivity(context) }, modifier = Modifier) },
         bottomBar = {
             NavigationButton(
-                onClick = { navigateToPlaylistGenerationActivity(context) },
+                onClick = { navigateToHomeActivity(context) },
                 modifier = Modifier
                     .padding(vertical = 16.dp)
                     .height(72.dp)
