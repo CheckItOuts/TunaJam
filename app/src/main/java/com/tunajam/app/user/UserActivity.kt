@@ -2,7 +2,6 @@ package com.tunajam.app.user
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,10 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -46,16 +42,13 @@ import coil.request.ImageRequest
 import com.tunajam.app.R
 import com.tunajam.app.friends.AddFriendFloatingActionButton
 import com.tunajam.app.friends.NavigationButton
-import com.tunajam.app.friends.TunaJamApp
-import com.tunajam.app.friends.TunaJamTopAppBar
 import com.tunajam.app.friends.navigateToAddFriendActivity
 import com.tunajam.app.friends.navigateToPlaylistGenerationActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.TunaJamTopAppBar
-import com.tunajam.app.ui.screens.FriendScreen
-import com.tunajam.app.ui.screens.TunaJamUiState
 import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamTheme
+import com.tunajam.app.user_data.UserData
 
 
 class UserActivity : ComponentActivity() {
@@ -63,12 +56,8 @@ class UserActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TunaJamTheme {
-
-                Column {
-                    ActivityLayout(this@UserActivity)
-                }
+                ActivityLayout(this@UserActivity)
             }
-
         }
     }
 }
@@ -81,6 +70,9 @@ fun UserPage(){
     val wantsToDisconnect = remember {
         mutableStateOf(false)
     }
+    val pseudo = UserData.getUserName(LocalContext.current).toString()
+    val email = UserData.getUserEmail(LocalContext.current).toString()
+    val img = UserData.getUserImgUrl(LocalContext.current).toString()
 
     Scaffold(
         topBar = {
@@ -100,16 +92,16 @@ fun UserPage(){
             ) {
                 //profil
                 //picture
-                val photo=TunaJamPhoto("", "")//TODO : passer la photo de profil du user en parametre
+                val photo=TunaJamPhoto(pseudo, img)
                 SetUserPicture(photo, Modifier)
                 // Pseudo
                 Text(
-                    text = "Mon pseudo", //TODO : remplir avec le pseudo
+                    text = pseudo,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
                 //mail
-                Text(text = "pseudo@mail.com", //TODO : remplir avec le mail
+                Text(text = email,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 15.dp)
                 )
@@ -127,7 +119,7 @@ fun UserPage(){
                 Column(modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 65.dp)
-                    .verticalScroll(rememberScrollState())){
+                    ){
                     Text(text = "En ce moment votre chanson c'est :",
                         style = MaterialTheme.typography.headlineLarge,
                         modifier = Modifier.padding(top = 15.dp)
@@ -194,16 +186,8 @@ fun ActivityLayout(context: Context) {
             )
         }
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 65.dp)
-        ) {
-            item {
-                val tunaJamViewModel: TunaJamViewModel =
-                    viewModel(factory = TunaJamViewModel.Factory)
-                UserPage()
-            }
-        }
+        val tunaJamViewModel: TunaJamViewModel =
+            viewModel(factory = TunaJamViewModel.Factory)
+        UserPage()
     }
 }

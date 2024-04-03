@@ -17,21 +17,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tunajam.app.R
@@ -78,19 +74,6 @@ class HomeActivity : ComponentActivity() {
                     }
                 }
             }
-            db.addUser("test", "test")
-            db.addUser("test2", "test2")
-            db.addUser("test3", "test3")
-            db.addUser("test4", "test4")
-            db.addUser("test5", "test5")
-            db.addUser("test6", "test6")
-            db.addFriend(pseudo, "test")
-            db.addFriend(pseudo, "test2")
-            db.addFriend(pseudo, "test3")
-            db.addFriend(pseudo, "test4")
-            db.addFriend(pseudo, "test5")
-            db.addFriend(pseudo, "test6")
-
             db.getFriends(pseudo) {
                 FriendDirectory.clearFriends()
                 it.size

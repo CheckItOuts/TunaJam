@@ -13,7 +13,6 @@ import com.tunajam.app.ui.screens.TunaJamViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +36,7 @@ import com.tunajam.app.friends.FriendsActivity
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.ui.screens.HomeScreen
 import com.tunajam.app.user.UserActivity
+import com.tunajam.app.user_data.UserData
 
 @Composable
 fun TunaJamApp(context: Context) {
@@ -63,6 +63,7 @@ fun TunaJamApp(context: Context) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, context:Context, modifier: Modifier = Modifier) {
+    val pseudo = UserData.getUserName(context).toString()
     CenterAlignedTopAppBar(
         scrollBehavior = scrollBehavior,
         title = {
@@ -76,7 +77,7 @@ fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, context:Context, m
         },
 
         actions = {
-            Navigation(userName = "User", context)
+            Navigation(userName = pseudo, context)
         },
     )
 }

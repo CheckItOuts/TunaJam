@@ -50,9 +50,15 @@ class MainActivity : ComponentActivity() {
     private fun navigateToHome(accessToken: String, refreshToken: String) {
         val db = Database()
         val spotifyAPI = SpotifyAPI()
-        spotifyAPI.getUserProfile(accessToken, this@MainActivity){displayName,_,_,imgUsrUrl ->
-            UserData.saveUserName(this, displayName.toString()) // On sauvegarde le nom de l'utilisateur
-            db.addUser(displayName.toString(), imgUsrUrl.toString()) // On ajoute l'utilisateur à la base de données
+        spotifyAPI.getUserProfile(accessToken, this@MainActivity){displayName,emailUser,_,imgUsrUrl ->
+            UserData.saveUserName(this, displayName.toString())
+            UserData.saveUserEmail(this,emailUser.toString())
+            var imgUsr = imgUsrUrl
+            if (imgUsrUrl == null) {
+                imgUsr = "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg"
+            }
+            UserData.saveUserImgUrl(this,imgUsr.toString())
+            db.addUser(displayName.toString(), imgUsr.toString()) // On ajoute l'utilisateur à la base de données
         }
         UserData.saveTokens(this, accessToken, refreshToken) // On sauvegarde les tokens
         // On navigue vers l'activité principale
