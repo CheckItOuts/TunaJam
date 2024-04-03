@@ -13,6 +13,7 @@ import com.tunajam.app.ui.screens.TunaJamViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -108,7 +109,7 @@ private fun Navigation(
                 navigateToFriendPage(context = context)
             }
         ){
-            androidx.compose.material3.Icon(Icons.Default.FavoriteBorder, contentDescription = "Friend")
+            androidx.compose.material3.Icon(Icons.Default.AccountBox, contentDescription = "Friend")
         }
 
     }
