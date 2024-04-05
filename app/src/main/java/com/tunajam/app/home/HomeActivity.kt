@@ -167,7 +167,7 @@ fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
                         onClick = { navigateToPlaylistGenerationActivity(context) },
                         modifier = Modifier
                             .padding(vertical = 16.dp)
-                            .height(72.dp)
+                            .height(100.dp)
                             .fillMaxWidth()
                     )
                 }

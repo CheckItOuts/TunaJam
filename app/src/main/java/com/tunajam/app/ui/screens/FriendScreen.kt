@@ -16,9 +16,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +42,7 @@ import com.tunajam.app.data.Friend
 import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
+import com.tunajam.app.ui.theme.TunaJamViolet
 import com.tunajam.app.user_data.UserData
 
 /**
@@ -45,8 +50,11 @@ import com.tunajam.app.user_data.UserData
  */
 @Composable
 fun FriendScreen(
-    tunaJamUiState: TunaJamUiState, retryAction: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp),
-    ) {
+    tunaJamUiState: TunaJamUiState,
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+) {
     // Songs recommendation
     //LoadSongRecommendationPanel()
     // User playlists grid
@@ -54,14 +62,20 @@ fun FriendScreen(
     when (tunaJamUiState) {
         is TunaJamUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxWidth())
         is TunaJamUiState.Error -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
-        is TunaJamUiState.Success -> PhotosColumnScreen(FriendDirectory.friends, tunaJamUiState.photos, modifier.fillMaxWidth())
+        is TunaJamUiState.Success -> PhotosColumnScreen(
+            FriendDirectory.friends,
+            tunaJamUiState.photos,
+            modifier.fillMaxWidth()
+        )
+
         else -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
     }
 }
+
 @Composable
 fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val deleteFriend = remember { mutableStateOf(false)}
+    val deleteFriend = remember { mutableStateOf(false) }
     val photo = friend.picture
     val pseudo = UserData.getUserName(context).toString()
     val db = Database()
@@ -95,10 +109,9 @@ fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
                             .padding(4.dp)
                             .align(Alignment.BottomEnd)
                     ) {
-                        if(friend.isActive) {
+                        if (friend.isActive) {
                             drawCircle(Color.Green, radius = 13.dp.toPx())
-                        }
-                        else{
+                        } else {
                             drawCircle(Color.Red, radius = 13.dp.toPx())
                         }
                     }
@@ -113,7 +126,11 @@ fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
                     },
 
                     ) {
-                    Text("Supprimer")
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Retirer l'ami",
+                        tint = TunaJamViolet
+                    )
                 }
             }
         }
@@ -130,7 +147,9 @@ fun PhotosColumnScreen(
 ) {
     println("Friends : $friends")
     LazyColumn(
-        modifier = modifier.padding(horizontal = 4.dp).height(630.dp),
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+            .height(630.dp),
         contentPadding = contentPadding,
     ) {
         items(items = friends, key = { friend -> friend.id }) { friend ->

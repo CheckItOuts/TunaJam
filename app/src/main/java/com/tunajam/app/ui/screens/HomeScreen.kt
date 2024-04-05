@@ -48,6 +48,7 @@ import com.tunajam.app.data.SongDirectory
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamTheme
+import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
 
 
@@ -74,8 +75,15 @@ fun LoadSongRecommendationPanel(songs: List<Song> = SongDirectory.songs, playlis
     Row(modifier= Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(
+            text = "Mes Recommandations:",
+            style = Typography.titleMedium,
+        )
         songs.forEach { song ->
             DisplayRecomandedTitle(song, Modifier.weight(1f), playlists)
+        }
+        if(songs.isEmpty()){
+
         }
     }
 }
@@ -247,9 +255,14 @@ fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
 //charge les photos de playliste sous forme de grille
 fun PhotosGridScreen(
     photos: List<TunaJamPhoto>,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     contentPadding: PaddingValues = PaddingValues(0.dp)
+
 ) {
+    Text(
+        text = "Mon Contenu:",
+        style = Typography.titleMedium,
+    )
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
