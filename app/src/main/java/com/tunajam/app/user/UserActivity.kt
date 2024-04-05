@@ -5,8 +5,10 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -40,15 +42,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tunajam.app.R
-import com.tunajam.app.friends.AddFriendFloatingActionButton
-import com.tunajam.app.friends.NavigationButton
-import com.tunajam.app.friends.navigateToAddFriendActivity
-import com.tunajam.app.friends.navigateToHomeActivity
-import com.tunajam.app.home.navigateToPlaylistGenerationActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.TunaJamTopAppBar
 import com.tunajam.app.ui.screens.TunaJamViewModel
+import com.tunajam.app.ui.theme.TunaJamBleuPale
 import com.tunajam.app.ui.theme.TunaJamTheme
+import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
 
 
@@ -98,7 +97,7 @@ fun UserPage(){
                 // Pseudo
                 Text(
                     text = pseudo,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = Typography.titleMedium,
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
                 //mail
@@ -122,7 +121,7 @@ fun UserPage(){
                     .padding(top = 65.dp)
                     ){
                     Text(text = "En ce moment votre chanson c'est :",
-                        style = MaterialTheme.typography.headlineLarge,
+                        style = Typography.titleMedium,
                         modifier = Modifier.padding(top = 15.dp)
                     )
                     Text(text = "Le titre de ma chanson, L'Artiste.", //TODO : remplir avec la chanson du moment
@@ -139,10 +138,14 @@ fun UserPage(){
 @Composable
 fun SetUserPicture(photo: TunaJamPhoto, modifier: Modifier){
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = CircleShape,
+        border = BorderStroke(3.dp, TunaJamBleuPale),
     ) {
-        Box(modifier = Modifier) {
-            // Dessine un cercle autour de l'image
+        Box(modifier = modifier,
+            contentAlignment = Alignment.Center) {
+
+            // Photo de profil du user
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current).data(data = photo.imgSrc)
@@ -156,14 +159,7 @@ fun SetUserPicture(photo: TunaJamPhoto, modifier: Modifier){
                     .size(100.dp) // Taille de l'image
                     .clip(CircleShape) // Clipping pour rendre l'image ronde
             )
-            Canvas(
-                modifier = Modifier
-                    .size(16.dp)
-                    .padding(4.dp)
-                    .align(Alignment.BottomEnd)
-            ) {
-                drawCircle(Color.Green, radius = 13.dp.toPx())
-            }
+
         }
     }
 }
@@ -176,15 +172,7 @@ fun ActivityLayout(context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
-        bottomBar = {
-            NavigationButton(
-                onClick = { navigateToHomeActivity(context) },
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .height(72.dp)
-                    .fillMaxWidth()
-            )
-        }
+
     ) {
         val tunaJamViewModel: TunaJamViewModel =
             viewModel(factory = TunaJamViewModel.Factory)

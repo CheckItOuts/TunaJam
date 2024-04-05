@@ -63,15 +63,7 @@ fun TunaJamApp(context: Context) {
     Scaffold(
         topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
         floatingActionButton = {AddFriendFloatingActionButton({navigateToAddFriendActivity(context)}, modifier = Modifier)},
-        bottomBar = {
-            NavigationButton(
-                onClick = { navigateToHomeActivity(context) },
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .height(72.dp)
-                    .fillMaxWidth()
-            )
-        }
+
     ) {
         LazyColumn(
             modifier = Modifier
@@ -121,18 +113,3 @@ fun navigateToAddFriendActivity(context: Context){
     context.startActivity(intent)
 }
 
-@Composable
-fun NavigationButton(
-    onClick: () -> Unit,
-    modifier: Modifier
-) {
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) {
-        Button(onClick = onClick) {
-            Text(text = "Retour à la page d'accueil")
-        }
-    }
-}

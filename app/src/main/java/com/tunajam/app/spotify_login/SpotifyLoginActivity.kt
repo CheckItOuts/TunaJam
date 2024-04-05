@@ -5,23 +5,36 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import com.tunajam.app.R
 import com.tunajam.app.firebase.Database
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.MainActivity.Companion.authenticateWithSpotify
+import com.tunajam.app.ui.theme.TunaJamBleuPale
+import com.tunajam.app.ui.theme.TunaJamViolet
+import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
 
 
@@ -129,16 +142,41 @@ fun LoginScreen(mainActivity: MainActivity) {
     MaterialTheme {
         Column(
             modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
                 onClick = { authenticateWithSpotify(mainActivity) },
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                //shape= CircleShape,
+                colors = ButtonColors(
+                    containerColor = TunaJamViolet,
+                    contentColor = Color.White,
+                    disabledContainerColor = TunaJamBleuPale,
+                    disabledContentColor = Color.White
+                ),
+                contentPadding = PaddingValues(30.dp)
             ) {
-                Text(text = "Connexion avec Spotify")
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                )
+                {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_spotify_login),
+                        contentDescription = "App Logo",
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(200.dp)
+                    )
+                    Text(text = "Connexion avec Spotify",
+                        textAlign = TextAlign.Center,
+                        style = Typography.titleLarge)
+                }
+
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.tunajam.app
 
+import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +16,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        //set up custom fonts
+        getTypefaceFromFont(this@MainActivity, "font/art_nuvo.ttf")
         setContent {
             TunaJamTheme {
                 Surface(
@@ -23,5 +27,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+fun getTypefaceFromFont(context: Context, fontPath: String): Typeface? {
+    return try {
+        Typeface.createFromAsset(context.assets, fontPath)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        System.out.println("FONT NOT FOUND")
+        null
     }
 }

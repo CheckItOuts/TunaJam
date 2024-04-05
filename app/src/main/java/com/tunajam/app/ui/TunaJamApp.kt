@@ -4,14 +4,19 @@ package com.tunajam.app.ui
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import com.tunajam.app.ui.screens.TunaJamViewModel
 
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -22,20 +27,36 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.tunajam.app.R
 import com.tunajam.app.friends.FriendsActivity
 import com.tunajam.app.home.HomeActivity
+import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.screens.HomeScreen
+import com.tunajam.app.ui.theme.TunaJamBeige
+import com.tunajam.app.ui.theme.TunaJamBleuPale
+import com.tunajam.app.ui.theme.TunaJamViolet
+import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user.UserActivity
 import com.tunajam.app.user_data.UserData
 
@@ -67,51 +88,90 @@ fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, context:Context, m
     val pseudo = UserData.getUserName(context).toString()
     CenterAlignedTopAppBar(
         scrollBehavior = scrollBehavior,
+        modifier = modifier.padding(5.dp),
+        colors = TopAppBarColors(
+            containerColor = TunaJamViolet,
+            scrolledContainerColor = TunaJamViolet,
+            navigationIconContentColor = TunaJamBleuPale,
+            titleContentColor = Color.White,
+            actionIconContentColor = TunaJamBleuPale,
+        ),
         title = {
             Text(
                 text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineSmall,
+                style = Typography.titleLarge,
                 modifier = modifier.clickable {
                     navigateToHomePage(context = context)
                 },
             )
         },
+        navigationIcon = {
+            Box(modifier = Modifier) {
+                userProfileButton(userName = pseudo, context)
+            }
+        },
 
         actions = {
-            Navigation(userName = pseudo, context)
+            Box(modifier = Modifier.align(Alignment.CenterVertically)) {
+                    friendListButton(context = context)
+                }
         },
     )
 }
 
 
 @Composable
-private fun Navigation(
+private fun userProfileButton(
     userName: String,
-    context:Context
+    context: Context
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_broken_image), // Replace R.drawable.ic_user with your user icon
-            contentDescription = "User Icon",
-            modifier = Modifier.padding(end = 16.dp).clickable {
-                navigateToUserProfile(context = context)
-            }
+    val photo= TunaJamPhoto(userName, UserData.getUserImgUrl(LocalContext.current).toString())
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            navigateToFriendPage(context = context)
+        }
+    ) {
+
+        Image(
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = photo.imgSrc)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        crossfade(true)
+                    }).build()
+            ),
+            contentDescription = stringResource(R.string.tunaJam_photo),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(40.dp) // Taille de l'image
+                .clip(CircleShape) // Clipping pour rendre l'image ronde
         )
         Text(
             text = userName,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(end = 16.dp).clickable {
-                navigateToUserProfile(context = context)
-            }
+            style = MaterialTheme.typography.titleSmall,
         )
-        Box(
-            modifier = Modifier.padding(end = 16.dp).clickable {
-                navigateToFriendPage(context = context)
-            }
-        ){
-            androidx.compose.material3.Icon(Icons.Default.AccountBox, contentDescription = "Friend")
-        }
+    }
 
+}
+
+@Composable
+private fun friendListButton(
+    context: Context
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            navigateToFriendPage(context = context)
+        }
+    ){
+        Icon(Icons.Default.AccountBox, contentDescription = "Friend")
+        Text(
+            text = "Mes amis",
+            style = MaterialTheme.typography.titleSmall,
+
+        )
     }
 }
 fun navigateToUserProfile(context: Context) {
