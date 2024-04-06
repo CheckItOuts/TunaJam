@@ -91,4 +91,19 @@ object UserData {
         val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
         return sharedPref.getString(USER_IMG_URL, null)
     }
+
+    fun clearUserData(context: Context) {
+        // On sauvegarde le token dans les préférences partagées
+        val sharedPref = context.getSharedPreferences("spotify", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString(ACCESS_TOKEN, null)
+            putString(REFRESH_TOKEN, null)
+            putString(USER_ID, null)
+            putString(USER_NAME, null)
+            putString(USER_EMAIL, null)
+            putString(USER_IMG_URL, null)
+            apply()
+        }
+        context.cacheDir?.deleteRecursively()
+    }
 }
