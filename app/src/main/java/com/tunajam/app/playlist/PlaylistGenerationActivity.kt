@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -69,6 +70,7 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
     var maxValence by remember { mutableFloatStateOf(0.5f) }
     var maxSpeechiness by remember { mutableFloatStateOf(0.5f) }
     var selectedGenres by remember { mutableStateOf(emptyList<String>()) }
+    var searchQuery by remember { mutableStateOf("") }
     val genresList = listOf("acoustic", "afrobeat", "alt-rock",
         "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues",
         "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house",
@@ -136,9 +138,17 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 15.dp)
                 )
+                TextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    label = { Text("Rechercher un genre") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                )
 
                 GenreSelection(
-                    genresList = genresList,
+                    genresList = genresList.filter { it.contains(searchQuery, ignoreCase = true) },
                     selectedGenres = selectedGenres,
                     onGenreSelected = { genre ->
                         selectedGenres = selectedGenres.toMutableList().apply { add(genre) }
@@ -153,7 +163,7 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                 // Generate playlist button
                 Button(
                     onClick = {
-                        if (selectedGenres.isNotEmpty() && selectedFriends.size in 0..5) {
+                        if (selectedGenres.size in 1..5 && selectedFriends.size in 0..5) {
                             generatePlaylist(
                                 context,
                                 selectedFriends,
@@ -167,7 +177,7 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                         } else {
                             // Afficher un message d'erreur à l'utilisateur
                             // Cela pourrait être un Toast, un Snackbar ou toute autre méthode que vous préférez
-                            Toast.makeText(context, "Sélectionnez au moins 1 genre et entre 0 et 5 amis.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Sélectionnez entre 1 et 5 genres et entre 0 et 5 amis.", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier

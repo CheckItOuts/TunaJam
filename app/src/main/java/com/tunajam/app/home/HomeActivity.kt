@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,9 +68,10 @@ class HomeActivity : ComponentActivity() {
                     val urlPlaylist = json.get("uri")
                     val imagesArr = json.get("images") as? JSONArray
                     val imageUrl = imagesArr?.optJSONObject(0)?.optString("url")
+                    println(json.get("id").toString())
                     PlaylistDirectory.addPlaylist(json.get("name").toString(), json.get("id").toString())
                     imageUrl?.let {
-                        val photo = TunaJamPhoto("$i", it)
+                        val photo = TunaJamPhoto(json.get("id").toString(), it)
                         playlistPhotos.add(photo)
                     }
                 }
@@ -203,20 +205,19 @@ fun NavigationButton(
 ) {
     Box(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxWidth()
     ) {
         IconButton(
             onClick = onClick,
             modifier = Modifier
-                .align(Alignment.Center) // Align the IconButton to the end of the Box
+                .align(Alignment.Center)
+                .size(100.dp)// Align the IconButton to the end of the Box
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_round),
                 contentDescription = "App Logo",
                 modifier = Modifier
-                    .width(72.dp)
-                    .height(72.dp)
+                    .size(85.dp)
             )
         }
     }

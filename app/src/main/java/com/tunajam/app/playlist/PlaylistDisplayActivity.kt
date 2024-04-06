@@ -2,10 +2,12 @@ package com.tunajam.app.playlist
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -122,10 +124,14 @@ fun TrackItem(track: JSONObject) {
                 crossfade(true)
             }).build()
     )
-
+    val context = LocalContext.current
     Row(
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         modifier = Modifier.padding(8.dp)
+            .clickable {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(track.get("uri").toString()))
+                context.startActivity(intent)
+            }
     ) {
         Image(
             painter = painter,
