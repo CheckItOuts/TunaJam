@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -68,7 +67,6 @@ class HomeActivity : ComponentActivity() {
                     val urlPlaylist = json.get("uri")
                     val imagesArr = json.get("images") as? JSONArray
                     val imageUrl = imagesArr?.optJSONObject(0)?.optString("url")
-                    println(json.get("id").toString())
                     PlaylistDirectory.addPlaylist(json.get("name").toString(), json.get("id").toString())
                     imageUrl?.let {
                         val photo = TunaJamPhoto(json.get("id").toString(), it)
@@ -103,10 +101,10 @@ class HomeActivity : ComponentActivity() {
                             val album = json.get("album") as JSONObject
                             val albumJson = album.get("images") as? JSONArray
                             val imageUrl = albumJson?.optJSONObject(0)?.optString("url")
+                            val idSong = json.get("id").toString()
                             SongDirectory.addSong(json.get("name").toString(),
                                 (json.get("artists") as JSONArray).optJSONObject(0)?.optString("name").toString(),
-                                imageUrl.toString(),json.get("uri").toString())
-                            val idSong = json.get("id").toString()
+                                imageUrl.toString(),idSong)
                             println(idSong)
                             db.addMusic(pseudo, idSong)
                         }

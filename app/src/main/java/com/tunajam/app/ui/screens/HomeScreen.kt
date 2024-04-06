@@ -135,7 +135,8 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         placeholder = painterResource(R.drawable.loading_img),
                         contentDescription = stringResource(R.string.tunaJam_photo),
                         modifier = Modifier.clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(song.songUri))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                                "https://open.spotify.com/track/"+song.songUri))
                             context.startActivity(intent)
                         })
                     Text(text = song.title, modifier=modifier, textAlign = TextAlign.Center)

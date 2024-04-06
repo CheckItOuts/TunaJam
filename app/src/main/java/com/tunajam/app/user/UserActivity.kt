@@ -2,18 +2,16 @@ package com.tunajam.app.user
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -43,6 +40,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tunajam.app.R
 import com.tunajam.app.model.TunaJamPhoto
+import com.tunajam.app.spotify_login.MainActivity
 import com.tunajam.app.ui.TunaJamTopAppBar
 import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamBleuPale
@@ -73,7 +71,7 @@ fun UserPage(){
     val pseudo = UserData.getUserName(LocalContext.current).toString()
     val email = UserData.getUserEmail(LocalContext.current).toString()
     val img = UserData.getUserImgUrl(LocalContext.current).toString()
-
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -110,6 +108,11 @@ fun UserPage(){
                 ElevatedButton(
                     onClick = {
                         wantsToDisconnect.value = !wantsToDisconnect.value
+                        UserData.clearUserData(context) // Clear user data
+                        // Navigate back to login screen
+                        val intent = Intent(context, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        context.startActivity(intent)
                     },
 
                     ) {

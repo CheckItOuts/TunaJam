@@ -98,16 +98,27 @@ fun PlaylistDisplayPage(playlistData: MutableList<JSONObject>) {
                         }
                     })
         },
-        content={
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 65.dp, bottom = 65.dp)
-        ) {
-            items(playlistData) { track ->
-                TrackItem(track)
+        content = {
+            if (playlistData.isEmpty()) {
+                Text(
+                    text = "Aucune chanson dans la playlist",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                // Display the playlist data
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 65.dp, bottom = 65.dp)
+                ) {
+                    items(playlistData) { track ->
+                        TrackItem(track)
+                    }
+                }
             }
-        }
         }
     )
 }
@@ -129,7 +140,8 @@ fun TrackItem(track: JSONObject) {
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
         modifier = Modifier.padding(8.dp)
             .clickable {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(track.get("uri").toString()))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "https://open.spotify.com/track/"+track.get("id").toString()))
                 context.startActivity(intent)
             }
     ) {
