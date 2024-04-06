@@ -72,18 +72,21 @@ fun HomeScreen(
  */
 @Composable
 fun LoadSongRecommendationPanel(songs: List<Song> = SongDirectory.songs, playlists: List<Playlist> = PlaylistDirectory.playlists){
+    Text(
+        text = "Mes Recommandations:",
+        style = Typography.titleMedium,
+    )
     Row(modifier= Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            text = "Mes Recommandations:",
-            style = Typography.titleMedium,
-        )
         songs.forEach { song ->
             DisplayRecomandedTitle(song, Modifier.weight(1f), playlists)
         }
         if(songs.isEmpty()){
-
+            Text(
+                text = "Pas de chansons recommandées !",
+                style = Typography.titleMedium,
+            )
         }
     }
 }
