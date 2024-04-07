@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -152,18 +155,16 @@ fun LoginScreen(mainActivity: MainActivity) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = { authenticateWithSpotify(mainActivity) },
+            ElevatedButton(onClick = { authenticateWithSpotify(mainActivity)},
                 modifier = Modifier.padding(16.dp),
-                //shape= CircleShape,
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 12.dp),
                 colors = ButtonColors(
                     containerColor = TunaJamViolet,
                     contentColor = Color.White,
                     disabledContainerColor = TunaJamBleuPale,
                     disabledContentColor = Color.White
                 ),
-                contentPadding = PaddingValues(30.dp)
-            ) {
+                contentPadding = PaddingValues(30.dp)) {
                 Column(
                     modifier = Modifier,
                     horizontalAlignment = Alignment.CenterHorizontally,
