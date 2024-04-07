@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -113,7 +115,7 @@ class HomeActivity : ComponentActivity() {
                         TunaJamTheme {
                             val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)
                             Column {
-                                TunaJamApp(tunaJamUiState, this@HomeActivity)
+                                HomeSetContent(tunaJamUiState, this@HomeActivity)
                             }
                         }
                     }
@@ -159,7 +161,7 @@ class HomeActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
+fun HomeSetContent(tunaJamUiState: TunaJamUiState, context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = { TunaJamTopAppBar(scrollBehavior = scrollBehavior, context=context) },
@@ -167,8 +169,8 @@ fun TunaJamApp(tunaJamUiState: TunaJamUiState, context: Context) {
                         onClick = { navigateToPlaylistGenerationActivity(context) },
                         modifier = Modifier
                             .padding(vertical = 16.dp)
-                            .height(100.dp)
                             .fillMaxWidth()
+                            .fillMaxHeight()
                     )
                 }
     ) {
@@ -203,7 +205,8 @@ fun NavigationButton(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomCenter
     ) {
         IconButton(
             onClick = onClick,
@@ -214,7 +217,7 @@ fun NavigationButton(
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_round),
                 contentDescription = "App Logo",
-                modifier = Modifier
+                modifier = modifier.width(200.dp).height(200.dp)
                     .size(85.dp)
             )
         }
