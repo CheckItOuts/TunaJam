@@ -1,6 +1,9 @@
 package com.tunajam.app.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,18 +75,21 @@ fun HomeScreen(
  */
 @Composable
 fun LoadSongRecommendationPanel(songs: List<Song> = SongDirectory.songs, playlists: List<Playlist> = PlaylistDirectory.playlists){
+    Text(
+        text = "Mes Recommandations:",
+        style = Typography.titleMedium,
+    )
     Row(modifier= Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            text = "Mes Recommandations:",
-            style = Typography.titleMedium,
-        )
         songs.forEach { song ->
             DisplayRecomandedTitle(song, Modifier.weight(1f), playlists)
         }
         if(songs.isEmpty()){
-
+            Text(
+                text = "Pas de chansons recommandées !",
+                style = Typography.titleMedium,
+            )
         }
     }
 }
@@ -127,7 +133,12 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         .build(),
                         error = painterResource(R.drawable.ic_broken_image),
                         placeholder = painterResource(R.drawable.loading_img),
-                        contentDescription = stringResource(R.string.tunaJam_photo))
+                        contentDescription = stringResource(R.string.tunaJam_photo),
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                                "https://open.spotify.com/track/"+song.songUri))
+                            context.startActivity(intent)
+                        })
                     Text(text = song.title, modifier=modifier, textAlign = TextAlign.Center)
                     Text(text = song.author, modifier=modifier, textAlign = TextAlign.Center)
 
@@ -247,6 +258,11 @@ fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
+                .clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
+                        "https://open.spotify.com/playlist/"+photo.id))
+                    context.startActivity(intent)
+                }
         )
     }
 }

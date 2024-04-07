@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,7 +71,7 @@ class HomeActivity : ComponentActivity() {
                     val imageUrl = imagesArr?.optJSONObject(0)?.optString("url")
                     PlaylistDirectory.addPlaylist(json.get("name").toString(), json.get("id").toString())
                     imageUrl?.let {
-                        val photo = TunaJamPhoto("$i", it)
+                        val photo = TunaJamPhoto(json.get("id").toString(), it)
                         playlistPhotos.add(photo)
                     }
                 }
@@ -102,10 +103,10 @@ class HomeActivity : ComponentActivity() {
                             val album = json.get("album") as JSONObject
                             val albumJson = album.get("images") as? JSONArray
                             val imageUrl = albumJson?.optJSONObject(0)?.optString("url")
+                            val idSong = json.get("id").toString()
                             SongDirectory.addSong(json.get("name").toString(),
                                 (json.get("artists") as JSONArray).optJSONObject(0)?.optString("name").toString(),
-                                imageUrl.toString(),json.get("uri").toString())
-                            val idSong = json.get("id").toString()
+                                imageUrl.toString(),idSong)
                             println(idSong)
                             db.addMusic(pseudo, idSong)
                         }
@@ -206,21 +207,18 @@ fun NavigationButton(
         modifier = Modifier
             .padding(16.dp),
         contentAlignment = Alignment.BottomCenter
-
-            //.fillMaxSize()
-            //.fillMaxWidth()
     ) {
         IconButton(
             onClick = onClick,
             modifier = Modifier
-                .align(Alignment.Center) // Align the IconButton to the end of the Box
+                .align(Alignment.Center)
+                .size(100.dp)// Align the IconButton to the end of the Box
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_round),
                 contentDescription = "App Logo",
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(200.dp)
+                modifier = modifier.width(200.dp).height(200.dp)
+                    .size(85.dp)
             )
         }
     }

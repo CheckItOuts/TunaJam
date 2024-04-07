@@ -2,6 +2,7 @@
 
 package com.tunajam.app.ui
 
+
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.Image
@@ -9,17 +10,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import com.tunajam.app.ui.screens.TunaJamViewModel
-
-
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,13 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -53,13 +44,14 @@ import com.tunajam.app.friends.FriendsActivity
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.screens.HomeScreen
-import com.tunajam.app.ui.theme.TunaJamBeige
+import com.tunajam.app.ui.screens.TunaJamViewModel
 import com.tunajam.app.ui.theme.TunaJamBleuPale
 import com.tunajam.app.ui.theme.TunaJamViolet
 import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user.UserActivity
 import com.tunajam.app.user_data.UserData
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TunaJamApp(context: Context) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -130,7 +122,7 @@ private fun userProfileButton(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
-            navigateToFriendPage(context = context)
+            navigateToUserProfile(context = context)
         }
     ) {
 
