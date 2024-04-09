@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -88,31 +89,33 @@ fun FriendCard(friend: Friend, modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(modifier = Modifier) {
+                Box(modifier = Modifier.heightIn(80.dp)) {
                     // Dessine un cercle autour de l'image
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current).data(data = photo.imgSrc)
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    crossfade(true)
-                                }).build()
-                        ),
-                        contentDescription = stringResource(R.string.tunaJam_photo),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(100.dp) // Taille de l'image
-                            .clip(CircleShape) // Clipping pour rendre l'image ronde
-                    )
-                    Canvas(
-                        modifier = Modifier
-                            .size(16.dp)
-                            .padding(4.dp)
-                            .align(Alignment.BottomEnd)
-                    ) {
-                        if (friend.isActive) {
-                            drawCircle(Color.Green, radius = 13.dp.toPx())
-                        } else {
-                            drawCircle(Color.Red, radius = 13.dp.toPx())
+                    Box(modifier = Modifier) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current).data(data = photo.imgSrc)
+                                    .apply(block = fun ImageRequest.Builder.() {
+                                        crossfade(true)
+                                    }).build()
+                            ),
+                            contentDescription = stringResource(R.string.tunaJam_photo),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(65.dp) // Taille de l'image
+                                .clip(CircleShape) // Clipping pour rendre l'image ronde
+                        )
+                        Canvas(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .padding(4.dp)
+                                .align(Alignment.BottomEnd)
+                        ) {
+                            if (friend.isActive) {
+                                drawCircle(Color.Green, radius = 7.dp.toPx())
+                            } else {
+                                drawCircle(Color.Red, radius = 7.dp.toPx())
+                            }
                         }
                     }
                 }

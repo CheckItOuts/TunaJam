@@ -80,7 +80,6 @@ fun TunaJamTopAppBar(scrollBehavior: TopAppBarScrollBehavior, context:Context, m
     val pseudo = UserData.getUserName(context).toString()
     CenterAlignedTopAppBar(
         scrollBehavior = scrollBehavior,
-        modifier = modifier.padding(5.dp),
         colors = TopAppBarColors(
             containerColor = TunaJamViolet,
             scrolledContainerColor = TunaJamViolet,
