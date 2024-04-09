@@ -3,6 +3,7 @@ package com.tunajam.app.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +53,8 @@ import com.tunajam.app.data.Song
 import com.tunajam.app.data.SongDirectory
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.ui.theme.TunaJamBeige
+import com.tunajam.app.ui.theme.TunaJamBleuPale
 import com.tunajam.app.ui.theme.TunaJamTheme
 import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
@@ -57,7 +62,10 @@ import com.tunajam.app.user_data.UserData
 
 @Composable
 fun HomeScreen(
-    tunaJamUiState: TunaJamUiState, retryAction: () -> Unit, modifier: Modifier = Modifier, contentPadding: PaddingValues = PaddingValues(0.dp),
+    tunaJamUiState: TunaJamUiState,
+    retryAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     // Songs recommendation
     LoadSongRecommendationPanel()
@@ -65,7 +73,11 @@ fun HomeScreen(
     when (tunaJamUiState) {
         is TunaJamUiState.Loading -> LoadingScreen(modifier = Modifier.fillMaxWidth())
         is TunaJamUiState.Error -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
-        is TunaJamUiState.Success -> PhotosGridScreen(tunaJamUiState.photos, modifier.fillMaxWidth())
+        is TunaJamUiState.Success -> PhotosGridScreen(
+            tunaJamUiState.photos,
+            modifier.fillMaxWidth()
+        )
+
         else -> ErrorScreen(retryAction, modifier = Modifier.fillMaxWidth())
     }
 }
@@ -74,34 +86,48 @@ fun HomeScreen(
  * Displays the 3 recommendations of the day panel
  */
 @Composable
-fun LoadSongRecommendationPanel(songs: List<Song> = SongDirectory.songs, playlists: List<Playlist> = PlaylistDirectory.playlists){
+fun LoadSongRecommendationPanel(
+    songs: List<Song> = SongDirectory.songs,
+    playlists: List<Playlist> = PlaylistDirectory.playlists
+) {
     Text(
         text = "Mes Recommandations:",
         style = Typography.titleMedium,
     )
-    Row(modifier= Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
         songs.forEach { song ->
             DisplayRecomandedTitle(song, Modifier.weight(1f), playlists)
         }
-        if(songs.isEmpty()){
-            Text(
-                text = "Pas de chansons recommandées !",
-                style = Typography.titleMedium,
-            )
+        if (songs.isEmpty()) {
+            Box(
+                modifier = Modifier.background(TunaJamBeige) // Change the background color here
+                    .padding(8.dp).clip(RoundedCornerShape(20.dp))
+            ) {
+                Text(
+                    text = "Pas de chansons recommandées !",
+                    style = Typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
 
 @Composable
-fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Playlist>){
+fun DisplayRecomandedTitle(song: Song, modifier: Modifier, playlists: List<Playlist>) {
     val expanded = remember { mutableStateOf(false) }
     val removeSong = remember { mutableStateOf(false) }
     val extraPadding = if (expanded.value) 48.dp else 0.dp
     val imageNotListened = painterResource(R.drawable.songfished)
     val imageListened = painterResource(R.drawable.fishescaped)
-    val imagePainter = rememberUpdatedState(if (removeSong.value) imageListened else imageNotListened)
+    val imagePainter =
+        rememberUpdatedState(if (removeSong.value) imageListened else imageNotListened)
     val accessToken = UserData.getAccessToken(LocalContext.current).toString()
     val refreshToken = UserData.getRefreshToken(LocalContext.current).toString()
     val spotifyAPI = SpotifyAPI()
@@ -117,15 +143,17 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
             /*.padding(top = 8.dp),*/
             contentAlignment = Alignment.TopStart, //center
 
-        ){
-            Column(modifier = Modifier
-                .padding(bottom = extraPadding), verticalArrangement = Arrangement.Top) {
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = extraPadding), verticalArrangement = Arrangement.Top
+            ) {
                 Image(
-                    painter =imagePainter.value,
+                    painter = imagePainter.value,
                     contentDescription = "The fished song illustration",
                     contentScale = ContentScale.Crop,
                 )
-                if (!removeSong.value){
+                if (!removeSong.value) {
                     //Text(text = "Recommended by "+song.friend, color = Color.Gray,fontSize = 10.sp, lineHeight = 10.sp)
                     AsyncImage(model = ImageRequest.Builder(context = LocalContext.current)
                         .data(song.url)
@@ -135,12 +163,15 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         placeholder = painterResource(R.drawable.loading_img),
                         contentDescription = stringResource(R.string.tunaJam_photo),
                         modifier = Modifier.clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                                "https://open.spotify.com/track/"+song.songUri))
+                            val intent = Intent(
+                                Intent.ACTION_VIEW, Uri.parse(
+                                    "https://open.spotify.com/track/" + song.songUri
+                                )
+                            )
                             context.startActivity(intent)
                         })
-                    Text(text = song.title, modifier=modifier, textAlign = TextAlign.Center)
-                    Text(text = song.author, modifier=modifier, textAlign = TextAlign.Center)
+                    Text(text = song.title, modifier = modifier, textAlign = TextAlign.Center)
+                    Text(text = song.author, modifier = modifier, textAlign = TextAlign.Center)
 
                     //add song
                     ElevatedButton(
@@ -150,7 +181,7 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         modifier = Modifier.align(Alignment.CenterHorizontally),
 
                         ) {
-                        Text(if (expanded.value) "Ajouter "+song.title else "Ajouter à une playlist...")
+                        Text(if (expanded.value) "Ajouter " + song.title else "Ajouter à une playlist...")
                     }
                     //select a playlist
                     if (expanded.value) {
@@ -161,9 +192,15 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         ) {
                             for (playlist in playlists) {
                                 DropdownMenuItem(
-                                    text = { Text(playlist.title)},
+                                    text = { Text(playlist.title) },
                                     onClick = {
-                                        spotifyAPI.addSongToPlaylist(context,accessToken, refreshToken, playlist.id, song.songUri) {
+                                        spotifyAPI.addSongToPlaylist(
+                                            context,
+                                            accessToken,
+                                            refreshToken,
+                                            playlist.id,
+                                            song.songUri
+                                        ) {
                                             if (it) removeSong.value = true
                                         }
 
@@ -181,9 +218,11 @@ fun DisplayRecomandedTitle(song : Song, modifier : Modifier, playlists: List<Pla
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         colors = ButtonDefaults.buttonColors(Color.Red)
                     ) {
-                        Text(if (!removeSong.value)
-                            "Pas pour moi !"
-                        else "Noté")
+                        Text(
+                            if (!removeSong.value)
+                                "Pas pour moi !"
+                            else "Noté"
+                        )
                     }
                 }
 
@@ -259,8 +298,11 @@ fun TunaJamPhotoCard(photo: TunaJamPhoto, modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .padding(4.dp)
                 .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                        "https://open.spotify.com/playlist/"+photo.id))
+                    val intent = Intent(
+                        Intent.ACTION_VIEW, Uri.parse(
+                            "https://open.spotify.com/playlist/" + photo.id
+                        )
+                    )
                     context.startActivity(intent)
                 }
         )
@@ -289,9 +331,9 @@ fun PhotosGridScreen(
                 .padding(horizontal = 4.dp)
                 .height(800.dp),
             contentPadding = contentPadding,
-            ) {
-                items(items = photos, key = { photo -> photo.id }) { photo ->
-                    TunaJamPhotoCard(
+        ) {
+            items(items = photos, key = { photo -> photo.id }) { photo ->
+                TunaJamPhotoCard(
                     photo,
                     modifier = modifier
                         .padding(4.dp)
@@ -302,6 +344,7 @@ fun PhotosGridScreen(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun LoadingScreenPreview() {

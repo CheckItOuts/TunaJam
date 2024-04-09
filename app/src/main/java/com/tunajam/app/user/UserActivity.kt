@@ -144,6 +144,7 @@ fun SetUserPicture(photo: TunaJamPhoto, modifier: Modifier){
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = CircleShape,
         border = BorderStroke(3.dp, TunaJamBleuPale),
+        modifier = modifier.padding(top = 16.dp)
     ) {
         Box(modifier = modifier,
             contentAlignment = Alignment.Center) {

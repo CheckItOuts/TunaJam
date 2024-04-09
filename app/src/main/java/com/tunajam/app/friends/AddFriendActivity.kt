@@ -6,12 +6,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +35,8 @@ import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.ui.TunaJamTopAppBar
+import com.tunajam.app.ui.theme.TunaJamBeige
+import com.tunajam.app.ui.theme.TunaJamViolet
 import com.tunajam.app.user_data.UserData
 
 
@@ -73,6 +78,7 @@ class AddFriendActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 65.dp)
+                        .padding(16.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
                     // Friend selection
@@ -94,33 +100,66 @@ class AddFriendActivity : ComponentActivity() {
                     if (errorMessage.isNotEmpty()) {
                         Text(errorMessage, color = Color.Red)
                     }
+                    Text(
+                        text="Attention aux minuscules/majuscules",
+                        color = Color.Red
+                    )
+                    Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         ElevatedButton(
-                        onClick = {
-                            if (spotifyUsername.isNotEmpty()) {
-                                // Vérifier si le pseudo existe dans la liste des utilisateurs
-                                val userExists = users.contains(spotifyUsername)
-                                val pseudo = UserData.getUserName(context)
-                                if (userExists && pseudo != spotifyUsername) {
-                                    val photo = TunaJamPhoto(spotifyUsername, "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg")
-                                    FriendDirectory.addFriend(spotifyUsername, spotifyUsername, true, photo)
-                                    val db = Database()
-                                    db.addFriend(pseudo.toString(), spotifyUsername)
-                                    onClickHome() // Retour à la page d'accueil
-                                } else {
-                                    errorMessage = "L'utilisateur n'existe pas."
-                                }
-                            } else {
-                                errorMessage = "Veuillez entrer un pseudo."
-                            }
-
-                        },
+                            onClick = {
+                                navigateToFriendActivity(context, Modifier)
+                            },
+                            colors = ButtonColors(TunaJamBeige, Color.White, Color.Gray, Color.LightGray)
 
                         ) {
-                        Text("Ajouter")
-                    }
+                            Text("Annuler")
+                        }
+                        ElevatedButton(
+                            onClick = {
+                                spotifyUsername = spotifyUsername.replace(" ", "")
+                                if (spotifyUsername.isNotEmpty()) {
+                                    // Vérifier si le pseudo existe dans la liste des utilisateurs
+                                    val userExists = users.contains(spotifyUsername)
+                                    val pseudo = UserData.getUserName(context)
+                                    if (userExists && pseudo != spotifyUsername) {
+                                        val photo = TunaJamPhoto(
+                                            spotifyUsername,
+                                            "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg"
+                                        )
+                                        FriendDirectory.addFriend(
+                                            spotifyUsername,
+                                            spotifyUsername,
+                                            true,
+                                            photo
+                                        )
+                                        val db = Database()
+                                        db.addFriend(pseudo.toString(), spotifyUsername)
+                                        onClickHome() // Retour à la page d'accueil
+                                    } else {
+                                        errorMessage = "L'utilisateur n'existe pas."
+                                    }
+                                } else {
+                                    errorMessage = "Veuillez entrer un pseudo."
+                                }
+                            },
+                            colors = ButtonColors(
+                                TunaJamViolet,
+                                Color.White,
+                                Color.Gray,
+                                Color.LightGray
+                            )
 
+                        ) {
+                            Text("Ajouter")
+                        }
+
+                    }
                 }
             }
         )
     }
+}
+fun navigateToFriendActivity(context: Context, modifier: Modifier.Companion){
+    val intent = Intent(context, FriendsActivity::class.java)
+    context.startActivity(intent)
 }
