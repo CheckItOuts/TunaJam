@@ -54,8 +54,16 @@ class MainActivity : ComponentActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val accessToken = UserData.getAccessToken(this)
+        val refreshToken = UserData.getRefreshToken(this)
         // Possible que ça bug
-        if (UserData.getAccessToken(this) != null) {
+        if ((accessToken != null) && (refreshToken != null)) {
+            val spotifyAPI = SpotifyAPI()
+            spotifyAPI.refreshAccessToken(this,refreshToken) { newAccessToken ->
+                if (newAccessToken != null) {
+                    UserData.saveTokens(this, newAccessToken, refreshToken)
+                }
+            }
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()

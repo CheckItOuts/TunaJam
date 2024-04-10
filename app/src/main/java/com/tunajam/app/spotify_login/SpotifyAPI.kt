@@ -69,9 +69,16 @@ class SpotifyAPI {
      * Cette fonction permet de rafraîchir le token d'accès (toutes les 3600 secondes).
      */
     fun refreshAccessToken(context: Context, refreshToken: String, callback: (String?) -> Unit) {
+       val requestBody = FormBody.Builder()
+            .add("client_id", CLIENT_ID)
+            .add("client_secret", CLIENT_SECRET)
+            .add("refresh_token", refreshToken)
+            .add("grant_type", "refresh_token")
+            .build()
+
         val request = Request.Builder()
-            .url("https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=$refreshToken")
-            .addHeader("Authorization", "Basic <Base64 encoded client_id:client_secret>")
+            .url("https://accounts.spotify.com/api/token")
+            .post(requestBody)
             .build()
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
