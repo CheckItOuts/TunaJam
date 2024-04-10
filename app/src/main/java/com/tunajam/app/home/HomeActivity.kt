@@ -118,7 +118,6 @@ class HomeActivity : ComponentActivity() {
                                     ?.optString("name").toString(),
                                 imageUrl.toString(), idSong
                             )
-                            println(idSong)
                             db.addMusic(pseudo, idSong)
                         }
                     }

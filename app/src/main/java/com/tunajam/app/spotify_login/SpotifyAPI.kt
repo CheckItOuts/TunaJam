@@ -2,6 +2,7 @@ package com.tunajam.app.spotify_login
 
 import android.content.Context
 import com.google.gson.Gson
+import com.tunajam.app.firebase.Database
 import com.tunajam.app.user_data.UserData
 import okhttp3.Call
 import okhttp3.Callback
@@ -146,69 +147,6 @@ class SpotifyAPI {
             }
         })
     }
- /**
-     * Cette fonction permet de récupérer les artistes les plus écoutés par l'utilisateur.
-  *    ATTENTION : Fonction pas encore totalement implémentée (il faut tester)
-     */
-    fun getUserTopArtists(
-        context: Context,
-        accessToken: String,
-        refreshToken: String,
-        callback: (MutableList<String>?) -> Unit
-    ) {
-        val request = Request.Builder()
-            .url("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=5")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                // On vérifie si la requête a réussi lors de la réponse
-                if (!response.isSuccessful) {
-                    callback(null)
-                    return
-                }
-                val responseBody = response.body?.string()
-                if (responseBody.isNullOrEmpty()) {
-                    callback(null)
-                    return
-                }
-                try {
-                    // On récupère le JSON de la réponse
-                    val jsonObject = JSONObject(responseBody)
-                    val res = jsonObject.getJSONArray("items")
-                    val artists: MutableList<String> = mutableListOf()
-                    // On parcourt les artistes pour les ajouter à la liste
-                    for (i in 0 until res.length()) {
-                        val item = res.getJSONArray(i)
-                        val artist = item.get(0).toString()
-                        artists.add(artist)
-                    }
-                    callback(artists)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    callback(null)
-                }
-            }
-            // En cas d'échec de la requête
-            override fun onFailure(call: Call, e: IOException) {
-                if (e is SocketTimeoutException || e is ConnectException) {
-                    // Si le token d'accès a expiré, on le rafraîchit
-                    refreshAccessToken(context, refreshToken) { newAccessToken ->
-                        if (newAccessToken != null) {
-                            // On réessaie la requête avec le nouveau token
-                            getUserTopArtists(context, newAccessToken, refreshToken, callback)
-                        } else {
-                            callback(null)
-                        }
-                    }
-                } else {
-                    callback(null)
-                }
-            }
-        })
-    }
-
 
     companion object {
         const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
@@ -250,7 +188,7 @@ class SpotifyAPI {
                 }
             })
         }
-/**
+        /**
          * Cette fonction permet de récupérer les recommandations de chansons pour l'utilisateur.
          */
         fun getUserRecommendation(
@@ -259,65 +197,82 @@ class SpotifyAPI {
             callback: (MutableList<JSONObject>?) -> Unit
         ) {
             val spotifyAPI = SpotifyAPI()
-            spotifyAPI.getUserTopTracks(context, accessToken, refreshToken) { topTracks ->
-                spotifyAPI.getUserTopArtists(context, accessToken, refreshToken) { topArtists ->
-                    val seedTracks = topTracks?.joinToString(",")
-                    val seedArtists = topArtists?.joinToString(",")
-
-                    val request = Request.Builder()
-                        .url("https://api.spotify.com/v1/recommendations?seed_tracks=$seedTracks&seed_artists=$seedArtists&limit=3")
-                        .addHeader("Authorization", "Bearer $accessToken")
-                        .build()
-
-                    OkHttpClient().newCall(request).enqueue(object : Callback {
-                        override fun onResponse(call: Call, response: Response) {
-                            if (!response.isSuccessful) {
-                                callback(null)
-                                return
-                            }
-                            val responseBody = response.body?.string()
-                            if (responseBody.isNullOrEmpty()) {
-                                callback(null)
-                                return
-                            }
-                            try {
-                                val jsonObject = JSONObject(responseBody)
-                                val res = jsonObject.getJSONArray("tracks")
-                                val recommendations: MutableList<JSONObject> = mutableListOf()
-                                for (i in 0 until res.length()) {
-                                    val item = res.getJSONObject(i)
-                                    recommendations.add(item)
+            val seedTracksFriends: MutableList<String> = mutableListOf()
+            val db = Database()
+            val pseudo = UserData.getUserName(context).toString()
+            db.getFriends(pseudo) { friends ->
+                for (friend in friends) {
+                    db.getUser(friend["friendPseudo"].toString()) { userData ->
+                        if (userData != null) {
+                            val friendName = userData["pseudo"].toString()
+                            db.getLastMusic(friendName) {lastSong ->
+                                val songId = lastSong?.get("id").toString()
+                                if (songId.isNotEmpty()) {
+                                    seedTracksFriends.add(songId)
                                 }
-                                callback(recommendations)
-                            } catch (e: JSONException) {
-                                e.printStackTrace()
-                                callback(null)
                             }
                         }
-
-                        override fun onFailure(call: Call, e: IOException) {
-                            if (e is SocketTimeoutException || e is ConnectException) {
-                                spotifyAPI.refreshAccessToken(
-                                    context,
-                                    refreshToken
-                                ) { newAccessToken ->
-                                    if (newAccessToken != null) {
-                                        getUserRecommendation(
-                                            context,
-                                            newAccessToken,
-                                            refreshToken,
-                                            callback
-                                        )
-                                    } else {
-                                        callback(null)
-                                    }
-                                }
-                            } else {
-                                callback(null)
-                            }
-                        }
-                    })
+                    }
                 }
+            }
+            spotifyAPI.getUserTopTracks(context, accessToken, refreshToken) { topTracks ->
+                val seedTracks = topTracks?.joinToString(",")
+                while (seedTracksFriends.isEmpty()) {
+                    Thread.sleep(100)
+                }
+                val request = Request.Builder()
+                    .url("https://api.spotify.com/v1/recommendations?time_range=medium_term&limit=3&seed_tracks=${seedTracks}")
+                    .addHeader("Authorization", "Bearer $accessToken")
+                    .build()
+                println(seedTracksFriends)
+                OkHttpClient().newCall(request).enqueue(object : Callback {
+                    override fun onResponse(call: Call, response: Response) {
+                        if (!response.isSuccessful) {
+                            callback(null)
+                            return
+                        }
+                        val responseBody = response.body?.string()
+                        if (responseBody.isNullOrEmpty()) {
+                            callback(null)
+                            return
+                        }
+                        try {
+                            val jsonObject = JSONObject(responseBody)
+                            val res = jsonObject.getJSONArray("tracks")
+                            val recommendations: MutableList<JSONObject> = mutableListOf()
+                            for (i in 0 until res.length()) {
+                                val item = res.getJSONObject(i)
+                                recommendations.add(item)
+                            }
+                            callback(recommendations)
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                            callback(null)
+                        }
+                    }
+
+                    override fun onFailure(call: Call, e: IOException) {
+                        if (e is SocketTimeoutException || e is ConnectException) {
+                            spotifyAPI.refreshAccessToken(
+                                context,
+                                refreshToken
+                            ) { newAccessToken ->
+                                if (newAccessToken != null) {
+                                    getUserRecommendation(
+                                        context,
+                                        newAccessToken,
+                                        refreshToken,
+                                        callback
+                                    )
+                                } else {
+                                    callback(null)
+                                }
+                            }
+                        } else {
+                            callback(null)
+                        }
+                    }
+                })
             }
         }
 /**
