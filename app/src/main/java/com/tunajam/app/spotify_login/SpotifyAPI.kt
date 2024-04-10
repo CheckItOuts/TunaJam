@@ -122,6 +122,7 @@ class SpotifyAPI {
                         val track = item.get("id").toString()
                         tracks.add(track)
                     }
+                    println(tracks)
                     callback(tracks)
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -146,69 +147,6 @@ class SpotifyAPI {
             }
         })
     }
- /**
-     * Cette fonction permet de récupérer les artistes les plus écoutés par l'utilisateur.
-  *    ATTENTION : Fonction pas encore totalement implémentée (il faut tester)
-     */
-    fun getUserTopArtists(
-        context: Context,
-        accessToken: String,
-        refreshToken: String,
-        callback: (MutableList<String>?) -> Unit
-    ) {
-        val request = Request.Builder()
-            .url("https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=5")
-            .addHeader("Authorization", "Bearer $accessToken")
-            .build()
-
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                // On vérifie si la requête a réussi lors de la réponse
-                if (!response.isSuccessful) {
-                    callback(null)
-                    return
-                }
-                val responseBody = response.body?.string()
-                if (responseBody.isNullOrEmpty()) {
-                    callback(null)
-                    return
-                }
-                try {
-                    // On récupère le JSON de la réponse
-                    val jsonObject = JSONObject(responseBody)
-                    val res = jsonObject.getJSONArray("items")
-                    val artists: MutableList<String> = mutableListOf()
-                    // On parcourt les artistes pour les ajouter à la liste
-                    for (i in 0 until res.length()) {
-                        val item = res.getJSONArray(i)
-                        val artist = item.get(0).toString()
-                        artists.add(artist)
-                    }
-                    callback(artists)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    callback(null)
-                }
-            }
-            // En cas d'échec de la requête
-            override fun onFailure(call: Call, e: IOException) {
-                if (e is SocketTimeoutException || e is ConnectException) {
-                    // Si le token d'accès a expiré, on le rafraîchit
-                    refreshAccessToken(context, refreshToken) { newAccessToken ->
-                        if (newAccessToken != null) {
-                            // On réessaie la requête avec le nouveau token
-                            getUserTopArtists(context, newAccessToken, refreshToken, callback)
-                        } else {
-                            callback(null)
-                        }
-                    }
-                } else {
-                    callback(null)
-                }
-            }
-        })
-    }
-
 
     companion object {
         const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
@@ -260,12 +198,9 @@ class SpotifyAPI {
         ) {
             val spotifyAPI = SpotifyAPI()
             spotifyAPI.getUserTopTracks(context, accessToken, refreshToken) { topTracks ->
-                spotifyAPI.getUserTopArtists(context, accessToken, refreshToken) { topArtists ->
                     val seedTracks = topTracks?.joinToString(",")
-                    val seedArtists = topArtists?.joinToString(",")
-
                     val request = Request.Builder()
-                        .url("https://api.spotify.com/v1/recommendations?seed_tracks=$seedTracks&seed_artists=$seedArtists&limit=3")
+                        .url("https://api.spotify.com/v1/recommendations?time_range=medium_term&limit=3&seed_tracks=${seedTracks}")
                         .addHeader("Authorization", "Bearer $accessToken")
                         .build()
 
@@ -319,7 +254,6 @@ class SpotifyAPI {
                     })
                 }
             }
-        }
 /**
          * Cette fonction permet de récupérer les chansons recommandées pour une playlist avec les paramètres pour la génération.
          */
