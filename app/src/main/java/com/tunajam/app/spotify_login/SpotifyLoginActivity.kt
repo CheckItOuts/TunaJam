@@ -57,11 +57,13 @@ class MainActivity : ComponentActivity() {
         val accessToken = UserData.getAccessToken(this)
         val refreshToken = UserData.getRefreshToken(this)
         // Possible que ça bug
-        if ((accessToken != null) && (refreshToken != null)) {
+        if (((accessToken != null) or (accessToken == "accessToken")) && ((refreshToken != null) or (refreshToken == "refreshToken"))) {
             val spotifyAPI = SpotifyAPI()
-            spotifyAPI.refreshAccessToken(this,refreshToken) { newAccessToken ->
-                if (newAccessToken != null) {
-                    UserData.saveTokens(this, newAccessToken, refreshToken)
+            if (refreshToken != null) {
+                spotifyAPI.refreshAccessToken(this,refreshToken) { newAccessToken ->
+                    if (newAccessToken != null) {
+                        UserData.saveTokens(this, newAccessToken, refreshToken)
+                    }
                 }
             }
             val intent = Intent(this, HomeActivity::class.java)
