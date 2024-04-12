@@ -84,7 +84,6 @@ class HomeActivity : ComponentActivity() {
                     }
                 }
             }
-
             db.getFriends(pseudo) {
                 FriendDirectory.clearFriends()
                 it.size
@@ -103,8 +102,7 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
-                runOnUiThread {
-                    SongDirectory.clearSongs()
+                SongDirectory.clearSongs()
                     if (tracks != null) {
                         for (i in 0 until tracks.size) {
                             val json = tracks[i]
@@ -121,6 +119,7 @@ class HomeActivity : ComponentActivity() {
                             db.addMusic(pseudo, idSong)
                         }
                     }
+                runOnUiThread {
                     setContent {
                         TunaJamTheme {
                             val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)

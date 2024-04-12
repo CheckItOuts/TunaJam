@@ -208,7 +208,12 @@ class SpotifyAPI {
             val db = Database()
             val pseudo = UserData.getUserName(context).toString()
             db.getFriends(pseudo) { friends ->
-                for (friend in friends) {
+                if (friends.isEmpty()) {
+                    callback(null)
+                    return@getFriends
+                }
+                val randomFriends = friends.shuffled().take(3)
+                randomFriends.forEach{friend ->
                     db.getUser(friend["friendPseudo"].toString()) { userData ->
                         if (userData != null) {
                             val friendName = userData["pseudo"].toString()
@@ -222,16 +227,13 @@ class SpotifyAPI {
                     }
                 }
             }
-            spotifyAPI.getUserTopTracks(context, accessToken, refreshToken) { topTracks ->
-                val seedTracks = topTracks?.joinToString(",")
                 while (seedTracksFriends.isEmpty()) {
                     Thread.sleep(100)
                 }
                 val request = Request.Builder()
-                    .url("https://api.spotify.com/v1/recommendations?time_range=medium_term&limit=3&seed_tracks=${seedTracks}")
+                    .url("https://api.spotify.com/v1/recommendations?time_range=medium_term&limit=3&seed_tracks=${seedTracksFriends}")
                     .addHeader("Authorization", "Bearer $accessToken")
                     .build()
-                println(seedTracksFriends)
                 OkHttpClient().newCall(request).enqueue(object : Callback {
                     override fun onResponse(call: Call, response: Response) {
                         if (!response.isSuccessful) {
@@ -281,7 +283,6 @@ class SpotifyAPI {
                     }
                 })
             }
-        }
 /**
          * Cette fonction permet de récupérer les chansons recommandées pour une playlist avec les paramètres pour la génération.
          */
