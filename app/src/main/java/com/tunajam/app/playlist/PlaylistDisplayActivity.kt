@@ -11,9 +11,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,8 +37,13 @@ import com.tunajam.app.user_data.PlaylistData
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.ui.theme.TunaJamBleuPale
+import com.tunajam.app.ui.theme.TunaJamViolet
+import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
 
 class PlaylistDisplayActivity : ComponentActivity() {
@@ -60,20 +70,27 @@ fun PlaylistDisplayPage(playlistData: MutableList<JSONObject>) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text="Playlist Générée",
-                    style = MaterialTheme.typography.headlineSmall)}
+                    style = Typography.titleLarge)}
 
             )
         },
         bottomBar = {
                     TopAppBar(title = {
-                        Row {
+                        Row(horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier.fillMaxWidth()) {
 
                             Button(onClick = {val intent = Intent(context, HomeActivity::class.java)
                                 context.startActivity(intent)
-                            }) {
+                            }, colors = ButtonColors(
+                                containerColor =
+                                TunaJamViolet,
+                                contentColor = Color.White,
+                                disabledContainerColor = TunaJamBleuPale,
+                                disabledContentColor = Color.White)) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = "Go Back")
                                 Text(text = "Retour à l'accueil")
                             }
-                            Spacer(modifier = Modifier.weight(1f))
                             Button(
                                 onClick = {
                                     if (!playlistAdd) {
@@ -91,8 +108,15 @@ fun PlaylistDisplayPage(playlistData: MutableList<JSONObject>) {
                                 } else {
                                     "Ajouté !"
                                 } },
-                                modifier = Modifier.padding(end = 16.dp)
+                                modifier = Modifier.padding(end = 16.dp),
+                                colors = ButtonColors(
+                                    containerColor =
+                                    TunaJamViolet,
+                                    contentColor = Color.White,
+                                    disabledContainerColor = TunaJamBleuPale,
+                                    disabledContentColor = Color.White)
                             ) {
+                                Icon(Icons.Default.Check, contentDescription = "Generate Playlist")
                                 Text(text = textAdd)
                             }
                         }

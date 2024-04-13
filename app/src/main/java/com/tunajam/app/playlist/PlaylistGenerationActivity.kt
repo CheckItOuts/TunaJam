@@ -8,30 +8,42 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -42,22 +54,34 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tunajam.app.R
 import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.firebase.Database
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.ui.theme.TunaJamBleuPale
+import com.tunajam.app.ui.theme.TunaJamViolet
 import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.PlaylistData
 import com.tunajam.app.user_data.UserData
 import java.util.Locale
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.Layout
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 
 class PlaylistGenerationActivity : ComponentActivity() {
@@ -87,7 +111,15 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
     var selectedGenres by remember { mutableStateOf(emptyList<String>()) }
     var searchQuery by remember { mutableStateOf("") }
     val genresList = listOf(
-        "acoustic",
+
+        "classical",
+        "disco",
+        "electro",
+        "hip-hop", "jazz",
+        "k-pop",
+        "pop", "rock",
+        "r-n-b",
+        "techno", "acoustic",
         "afrobeat",
         "alt-rock",
         "alternative",
@@ -103,7 +135,6 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "cantopop",
         "chicago-house",
         "children",
-        "classical",
         "club",
         "comedy",
         "country",
@@ -111,13 +142,11 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "death-metal",
         "deep-house",
         "detroit-techno",
-        "disco",
         "disney",
         "drum-and-bass",
         "dub",
         "dubstep",
         "edm",
-        "electro",
         "electronic",
         "emo",
         "folk",
@@ -137,7 +166,6 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "hardcore",
         "hardstyle",
         "heavy-metal",
-        "hip-hop",
         "holidays",
         "honky-tonk",
         "house",
@@ -151,8 +179,6 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "j-idol",
         "j-pop",
         "j-rock",
-        "jazz",
-        "k-pop",
         "kids",
         "latin",
         "latino",
@@ -170,7 +196,6 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "pagode",
         "philippines-opm",
         "piano",
-        "pop",
         "pop-film",
         "post-dubstep",
         "power-pop",
@@ -178,12 +203,10 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "psych-rock",
         "punk",
         "punk-rock",
-        "r-n-b",
         "rainy-day",
         "reggae",
         "reggaeton",
         "road-trip",
-        "rock",
         "rock-n-roll",
         "rockabilly",
         "romance",
@@ -201,7 +224,6 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
         "swedish",
         "synth-pop",
         "tango",
-        "techno",
         "trance",
         "trip-hop",
         "turkish",
@@ -262,8 +284,13 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
 
 
                 EventSelection(eventsList, onEventSelected = { event ->
-                    selectedGenres = selectedGenres.toMutableList().apply { add(event) }}, onEventUnselected =  { event ->
+                    selectedGenres = selectedGenres.toMutableList().apply {
+                        add(event)
+                    }
+                    print("EventSelection: Selected genres: $selectedGenres")
+                }, onEventUnselected = { event ->
                     selectedGenres = selectedGenres.filter { it != event }
+                    print("EventSelection: Selected genres: $selectedGenres")
                 })
                 Text(
                     text = "Genres musicaux : (sélectionne au moins un genre)",
@@ -283,52 +310,69 @@ fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
                     selectedGenres = selectedGenres,
                     onGenreSelected = { genre ->
                         selectedGenres = selectedGenres.toMutableList().apply { add(genre) }
+                        print("EventSelection: Selected genres: $selectedGenres")
                     },
                     onGenreUnselected = { genre ->
                         selectedGenres = selectedGenres.filter { it != genre }
+                        print("EventSelection: Selected genres: $selectedGenres")
                     }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Generate playlist button
-                Button(
-                    onClick = {
-                        if (selectedGenres.size in 1..5 && selectedFriends.size in 0..5) {
-                            generatePlaylist(
-                                context,
-                                selectedFriends,
-                                maxAcousticness,
-                                maxDanceability,
-                                maxInstrulmentalness,
-                                maxValence,
-                                maxSpeechiness,
-                                selectedGenres
-                            )
-                        } else {
-                            // Afficher un message d'erreur à l'utilisateur
-                            // Cela pourrait être un Toast, un Snackbar ou toute autre méthode que vous préférez
-                            Toast.makeText(
-                                context,
-                                "Sélectionnez entre 1 et 5 genres et entre 0 et 5 amis.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    modifier = Modifier
-                        .align(CenterHorizontally)
-                        .padding(top = 16.dp)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.Bottom,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Générer la playlist")
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Button(
-                    onClick = {
-                        onClickHome()
-                    },
-                    modifier = Modifier.align(CenterHorizontally)
-                ) {
-                    Text("Retour à l'accueil")
+                    Button(
+                        onClick = {
+                            onClickHome()
+                        },
+                        colors = ButtonColors(
+                            containerColor = TunaJamViolet,
+                            contentColor = Color.White,
+                            disabledContainerColor = TunaJamBleuPale,
+                            disabledContentColor = Color.White
+                        ),
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Go Back")
+                        Text("Retour à l'accueil")
+                    }
+                    // Generate playlist button
+                    Button(
+                        onClick = {
+                            if (selectedGenres.size in 1..5 && selectedFriends.size in 0..5) {
+                                generatePlaylist(
+                                    context,
+                                    selectedFriends,
+                                    maxAcousticness,
+                                    maxDanceability,
+                                    maxInstrulmentalness,
+                                    maxValence,
+                                    maxSpeechiness,
+                                    selectedGenres
+                                )
+                            } else {
+                                // Afficher un message d'erreur à l'utilisateur
+                                // Cela pourrait être un Toast, un Snackbar ou toute autre méthode que vous préférez
+                                Toast.makeText(
+                                    context,
+                                    "Sélectionnez entre 1 et 5 genres et entre 0 et 5 amis.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        colors = ButtonColors(
+                            containerColor =
+                            TunaJamViolet,
+                            contentColor = Color.White,
+                            disabledContainerColor = TunaJamBleuPale,
+                            disabledContentColor = Color.White
+                        ),
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = "Generate Playlist")
+                        Text("Générer la playlist")
+                    }
                 }
             }
         }
@@ -346,7 +390,19 @@ fun ParameterSlider(label: String, value: Float, onValueChange: (Float) -> Unit)
             onValueChange = onValueChange,
             valueRange = 0f..1f,
             steps = 100,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderColors(
+                TunaJamBleuPale,
+                TunaJamBleuPale,
+                TunaJamBleuPale,
+                Color.LightGray,
+                Color.LightGray,
+                Color.LightGray,
+                Color.LightGray,
+                Color.LightGray,
+                Color.LightGray,
+                Color.LightGray
+            )
         )
     }
 }
@@ -409,7 +465,11 @@ fun EventSelection(
         modifier = Modifier.fillMaxWidth()
     ) {
         for (i in 0..2) {
-            EventItem(event = eventsList[i], onEventSelected = onEventSelected, onEventUnselected=onEventUnselected)
+            EventItem(
+                event = eventsList[i],
+                onEventSelected = onEventSelected,
+                onEventUnselected = onEventUnselected
+            )
         }
     }
     Row(
@@ -417,10 +477,13 @@ fun EventSelection(
         modifier = Modifier.fillMaxWidth()
     ) {
         for (i in 3..4) {
-            EventItem(event = eventsList[i], onEventSelected = onEventSelected, onEventUnselected=onEventUnselected)
+            EventItem(
+                event = eventsList[i],
+                onEventSelected = onEventSelected,
+                onEventUnselected = onEventUnselected
+            )
         }
     }
-
 }
 
 
@@ -430,36 +493,53 @@ fun EventItem(
     onEventSelected: (String) -> Unit,
     onEventUnselected: (String) -> Unit,
 ) {
-    var selected = remember{mutableStateOf(false)}
-    selected != selected
-    ElevatedButton({
-        if (selected.value){
-            onEventSelected
-        }
-        else{
-            onEventUnselected
+    var selected = remember { mutableStateOf(false) }
+    val eventImageResourceId = getResourceIdByName(event)
+    ElevatedButton(
+        onClick = {
+            selected.value = !selected.value
+            if (selected.value) {
+                onEventSelected(event)
+            } else {
+                onEventUnselected(event)
+            }
+        },
+        modifier = Modifier.padding(5.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 12.dp),
+        colors = ButtonColors(
+            containerColor = if (selected.value) {
+                TunaJamBleuPale
+            } else {
+                TunaJamViolet
+            },
+            contentColor = Color.White,
+            disabledContainerColor = TunaJamBleuPale,
+            disabledContentColor = Color.White
+        ),
+        contentPadding = PaddingValues(20.dp)
+    ) {
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        )
+        {
+            Image(
+                painter = painterResource(id = eventImageResourceId),
+                contentDescription = event + "Logo",
+
+                modifier = Modifier
+                    .width(65.dp)
+                    .height(65.dp)
+                    .clip(CircleShape)
+            )
+            Text(
+                text = event,
+                textAlign = TextAlign.Center,
+                style = Typography.titleMedium
+            )
         }
 
-    }) {
-        Box(
-            Modifier
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-                .clickable { onEventSelected(event) }
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.chill),
-                    contentDescription = "Event Logo",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(65.dp) // Taille de l'image
-                        .clip(CircleShape) // Clipping pour rendre l'image ronde
-                )
-                Text(text = event)
-            }
-        }
     }
 }
 
@@ -471,35 +551,45 @@ fun GenreSelection(
     onGenreUnselected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val columns = 2
+    val rows = if (expanded) {(genresList.size + columns - 1) / columns} else 5
 
-    Column {
-        val visibleGenres =
-            if (expanded) genresList else genresList.take(5) // Change 5 to desired initial number of visible items
-        visibleGenres.forEach { genre ->
-            val isChecked = selectedGenres.contains(genre)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 4.dp)
+
+    Column (
+    ){
+        repeat(rows) { rowIndex ->
+            Row(Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { isChecked ->
-                        if (isChecked) {
-                            onGenreSelected(genre)
-                        } else {
-                            onGenreUnselected(genre)
-                        }
-                    }
-                )
-                Text(
-                    text = genre.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                val start = rowIndex * columns
+                val end = min(start + columns, genresList.size)
+                for (i in start until end) {
+                    val genre = genresList[i]
+                    val isChecked = selectedGenres.contains(genre)
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                onGenreSelected(genre)
+                            } else {
+                                onGenreUnselected(genre)
+                            }
+                        },
+                        colors = CheckboxColors(Color.White, Color.White, TunaJamViolet, Color.White,Color.White, Color.White, Color.White, TunaJamViolet,
+                            TunaJamViolet, Color.White, Color.White, Color.White)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = genre.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
+                        style = MaterialTheme.typography.bodyMedium,
+                        //modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
 
-        if (!expanded && genresList.size > 5) { // Change 5 to the desired threshold for expansion
+        if (!expanded && genresList.size > 5) {
             TextButton(onClick = { expanded = true }) {
                 Text("Show More")
             }
@@ -511,53 +601,63 @@ fun GenreSelection(
     }
 }
 
-@Composable
-fun FriendSelection(
-    friendsList: List<String>,
-    selectedFriends: List<String>,
-    onFriendSelected: (String) -> Unit,
-    onFriendUnselected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedCount by remember { mutableIntStateOf(selectedFriends.size) }
+    @Composable
+    private fun getResourceIdByName(resourceName: String): Int {
+        val packageName = LocalContext.current.packageName
+        val resClass = Class.forName("$packageName.R\$drawable")
+        val resField = resClass.getField(resourceName.toLowerCase().replace("\\s+".toRegex(), "_"))
+        return resField.getInt(null)
+    }
 
-    Column {
-        val visibleGenres = if (expanded) friendsList else friendsList.take(5)
-        visibleGenres.forEach { genre ->
-            val isChecked = selectedFriends.contains(genre)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 4.dp)
-            ) {
-                Checkbox(
-                    checked = isChecked,
-                    enabled = !isChecked || selectedCount > 1,
-                    onCheckedChange = { isChecked ->
-                        if (selectedCount < 5) {
-                            onFriendSelected(genre)
-                            selectedCount++
-                        } else {
-                            onFriendUnselected(genre)
-                            selectedCount--
+
+    @Composable
+    fun FriendSelection(
+        friendsList: List<String>,
+        selectedFriends: List<String>,
+        onFriendSelected: (String) -> Unit,
+        onFriendUnselected: (String) -> Unit
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        var selectedCount by remember { mutableIntStateOf(selectedFriends.size) }
+
+        Column {
+            val visibleGenres = if (expanded) friendsList else friendsList.take(5)
+            visibleGenres.forEach { genre ->
+                val isChecked = selectedFriends.contains(genre)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    Checkbox(
+                        checked = isChecked,
+                        enabled = !isChecked || selectedCount > 1,
+                        onCheckedChange = { isChecked ->
+                            if (selectedCount < 5) {
+                                onFriendSelected(genre)
+                                selectedCount++
+                            } else {
+                                onFriendUnselected(genre)
+                                selectedCount--
+                            }
                         }
-                    }
-                )
-                Text(
-                    text = genre.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                    )
+                    Text(
+                        text = genre.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
-        }
 
-        if (!expanded && friendsList.size > 5) {
-            TextButton(onClick = { expanded = true }) {
-                Text("Show More")
-            }
-        } else if (expanded) {
-            TextButton(onClick = { expanded = false }) {
-                Text("Show Less")
+            if (!expanded && friendsList.size > 5) {
+                TextButton(onClick = { expanded = true }) {
+                    Text("Show More")
+                }
+            } else if (expanded) {
+                TextButton(onClick = { expanded = false }) {
+                    Text("Show Less")
+                }
             }
         }
     }
-}
+
