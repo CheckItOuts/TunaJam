@@ -69,6 +69,7 @@ class SpotifyAPI {
      * Cette fonction permet de rafraîchir le token d'accès (toutes les 3600 secondes).
      */
     fun refreshAccessToken(context: Context, refreshToken: String, callback: (String?) -> Unit) {
+        println("coucou")
        val requestBody = FormBody.Builder()
             .add("client_id", CLIENT_ID)
             .add("client_secret", CLIENT_SECRET)
@@ -84,6 +85,7 @@ class SpotifyAPI {
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string()
+                println(responseBody)
                 val jsonObject = JSONObject(responseBody!!)
                 val accessToken = jsonObject.getString("access_token")
                 UserData.saveTokens(context, accessToken, refreshToken)
@@ -103,7 +105,7 @@ class SpotifyAPI {
         context: Context,
         accessToken: String,
         refreshToken: String,
-        callback: (MutableList<String>?) -> Unit
+        callback: (MutableList<JSONObject>?) -> Unit
     ) {
         val request = Request.Builder()
             .url("https://api.spotify.com/v1/me/top/tracks?limit=5")
@@ -124,11 +126,10 @@ class SpotifyAPI {
                 try {
                     val jsonObject = JSONObject(responseBody)
                     val res = jsonObject.getJSONArray("items")
-                    val tracks: MutableList<String> = mutableListOf()
+                    val tracks: MutableList<JSONObject> = mutableListOf()
                     for (i in 0 until res.length()) {
                         val item = res.getJSONObject(i)
-                        val track = item.get("id").toString()
-                        tracks.add(track)
+                        tracks.add(item)
                     }
                     callback(tracks)
                 } catch (e: JSONException) {
@@ -156,8 +157,8 @@ class SpotifyAPI {
     }
 
     companion object {
-        const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
-        const val CLIENT_SECRET = "fd0de51ee127491fb6472f89bcd149d5"
+        const val CLIENT_ID = "91f756a765594cc39f41d6dcf0268c46"
+        const val CLIENT_SECRET = "b4a1bd97d4a44b3ba35ccd582831f01c"
         /**
          * Cette fonction permet d'échanger le code d'authentification contre des tokens d'accès.
          */
@@ -195,15 +196,9 @@ class SpotifyAPI {
                 }
             })
         }
-        /**
-         * Cette fonction permet de récupérer les recommandations de chansons pour l'utilisateur.
-         */
-        fun getUserRecommendation(
-            context: Context, accessToken: String,
-            refreshToken: String,
-            callback: (MutableList<JSONObject>?) -> Unit
+
+        fun getFriendsTopTitles(context: Context, callback: (MutableList<String>?) -> Unit
         ) {
-            val spotifyAPI = SpotifyAPI()
             val seedTracksFriends: MutableList<String> = mutableListOf()
             val db = Database()
             val pseudo = UserData.getUserName(context).toString()
@@ -212,8 +207,9 @@ class SpotifyAPI {
                     callback(null)
                     return@getFriends
                 }
-                val randomFriends = friends.shuffled().take(3)
+                val randomFriends = friends.shuffled().take(5)
                 randomFriends.forEach{friend ->
+                    println(friend["friendPseudo"].toString())
                     db.getUser(friend["friendPseudo"].toString()) { userData ->
                         if (userData != null) {
                             val friendName = userData["pseudo"].toString()
@@ -227,61 +223,81 @@ class SpotifyAPI {
                     }
                 }
             }
-                while (seedTracksFriends.isEmpty()) {
-                    Thread.sleep(100)
-                }
-                val request = Request.Builder()
-                    .url("https://api.spotify.com/v1/recommendations?time_range=medium_term&limit=3&seed_tracks=${seedTracksFriends}")
-                    .addHeader("Authorization", "Bearer $accessToken")
-                    .build()
-                OkHttpClient().newCall(request).enqueue(object : Callback {
-                    override fun onResponse(call: Call, response: Response) {
-                        if (!response.isSuccessful) {
-                            callback(null)
-                            return
-                        }
-                        val responseBody = response.body?.string()
-                        if (responseBody.isNullOrEmpty()) {
-                            callback(null)
-                            return
-                        }
-                        try {
-                            val jsonObject = JSONObject(responseBody)
-                            val res = jsonObject.getJSONArray("tracks")
-                            val recommendations: MutableList<JSONObject> = mutableListOf()
-                            for (i in 0 until res.length()) {
-                                val item = res.getJSONObject(i)
-                                recommendations.add(item)
-                            }
-                            callback(recommendations)
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                            callback(null)
-                        }
-                    }
+            while (seedTracksFriends.isEmpty()) {
+                Thread.sleep(100)
+            }
+            callback(seedTracksFriends)
+        }
 
-                    override fun onFailure(call: Call, e: IOException) {
-                        if (e is SocketTimeoutException || e is ConnectException) {
-                            spotifyAPI.refreshAccessToken(
-                                context,
-                                refreshToken
-                            ) { newAccessToken ->
-                                if (newAccessToken != null) {
-                                    getUserRecommendation(
-                                        context,
-                                        newAccessToken,
-                                        refreshToken,
-                                        callback
-                                    )
-                                } else {
-                                    callback(null)
-                                }
+        /**
+         * Cette fonction permet de récupérer les recommandations de chansons pour l'utilisateur.
+         */
+        /**
+         * Cette fonction permet de récupérer les recommandations de chansons pour l'utilisateur.
+         */
+        fun getUserRecommendation(
+            context: Context, accessToken: String,
+            refreshToken: String,
+            callback: (MutableList<JSONObject>?) -> Unit
+        ) {
+            val spotifyAPI = SpotifyAPI()
+            getFriendsTopTitles(context) { topTracks ->
+                    val seedTracks = topTracks?.joinToString(",")
+                    val request = Request.Builder()
+                        .url("https://api.spotify.com/v1/recommendations?seed_tracks=$seedTracks&limit=3")
+                        .addHeader("Authorization", "Bearer $accessToken")
+                        .build()
+
+                    OkHttpClient().newCall(request).enqueue(object : Callback {
+                        override fun onResponse(call: Call, response: Response) {
+                            if (!response.isSuccessful) {
+                                println(response.body?.string())
+                                callback(null)
+                                return
                             }
-                        } else {
-                            callback(null)
+                            val responseBody = response.body?.string()
+                            if (responseBody.isNullOrEmpty()) {
+                                callback(null)
+                                return
+                            }
+                            try {
+                                val jsonObject = JSONObject(responseBody)
+                                val res = jsonObject.getJSONArray("tracks")
+                                val recommendations: MutableList<JSONObject> = mutableListOf()
+                                for (i in 0 until res.length()) {
+                                    val item = res.getJSONObject(i)
+                                    recommendations.add(item)
+                                }
+                                callback(recommendations)
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
+                                callback(null)
+                            }
                         }
-                    }
-                })
+
+                        override fun onFailure(call: Call, e: IOException) {
+                            if (e is SocketTimeoutException || e is ConnectException) {
+                                spotifyAPI.refreshAccessToken(
+                                    context,
+                                    refreshToken
+                                ) { newAccessToken ->
+                                    if (newAccessToken != null) {
+                                        getUserRecommendation(
+                                            context,
+                                            newAccessToken,
+                                            refreshToken,
+                                            callback
+                                        )
+                                    } else {
+                                        callback(null)
+                                    }
+                                }
+                            } else {
+                                callback(null)
+                            }
+                        }
+                    })
+                }
             }
 /**
          * Cette fonction permet de récupérer les chansons recommandées pour une playlist avec les paramètres pour la génération.
@@ -477,21 +493,25 @@ class SpotifyAPI {
         refreshToken: String,
         playlistID: String,
         songUri: String,
+        songTitle : String,
+        songAutor : String,
         callback: (Boolean) -> Unit
     ) {
         val tracks = JSONArray()
-        tracks.put(songUri)
+        tracks.put("spotify:track:$songUri")
         val requestBody2 =
             "{\"uris\": $tracks}".toRequestBody("application/json".toMediaTypeOrNull())
+        println(requestBody2.toString())
         val request = Request.Builder()
             .url("https://api.spotify.com/v1/playlists/$playlistID/tracks")
             .addHeader("Authorization", "Bearer $accessToken")
             .post(requestBody2)
             .build()
-
+        println(request)
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                println(response.body?.string())
+                val db= Database()
+                db.addMusic(UserData.getUserName(context).toString(), songUri, songTitle, songAutor)
                 callback(response.isSuccessful)
             }
 
@@ -499,7 +519,7 @@ class SpotifyAPI {
                 if (e is SocketTimeoutException || e is ConnectException) {
                     refreshAccessToken(context, refreshToken) { newAccessToken ->
                         if (newAccessToken != null) {
-                            addSongToPlaylist(context, newAccessToken, refreshToken, playlistID, songUri, callback)
+                            addSongToPlaylist(context, newAccessToken, refreshToken, playlistID, songUri,songTitle,songAutor ,callback)
                         } else {
                             callback(false)
                         }

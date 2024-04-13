@@ -93,8 +93,7 @@ class HomeActivity : ComponentActivity() {
                             val friendName = userData["pseudo"].toString()
                             val friendPhotoUrl = userData["photo"].toString()
                             val friendPhoto = TunaJamPhoto(
-                                friendName,
-                                "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg"
+                                friendName, friendPhotoUrl
                             )
                             FriendDirectory.addFriend(friendName, friendName, true, friendPhoto)
                         }
@@ -102,6 +101,7 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
+                runOnUiThread {
                 SongDirectory.clearSongs()
                     if (tracks != null) {
                         for (i in 0 until tracks.size) {
@@ -116,10 +116,9 @@ class HomeActivity : ComponentActivity() {
                                     ?.optString("name").toString(),
                                 imageUrl.toString(), idSong
                             )
-                            db.addMusic(pseudo, idSong)
                         }
                     }
-                runOnUiThread {
+
                     setContent {
                         TunaJamTheme {
                             val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)

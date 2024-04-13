@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.tunajam.app.R
+import com.tunajam.app.firebase.Database
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.MainActivity
 import com.tunajam.app.ui.TunaJamTopAppBar
@@ -71,6 +73,15 @@ fun UserPage(){
     val pseudo = UserData.getUserName(LocalContext.current).toString()
     val email = UserData.getUserEmail(LocalContext.current).toString()
     val img = UserData.getUserImgUrl(LocalContext.current).toString()
+    val db = Database()
+    val lastSong = remember {mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        db.getLastMusic(pseudo) { music ->
+            val songName = music?.get("name")?.toString() ?: "Unknown"
+            val artistName = music?.get("artist")?.toString() ?: "Unknown"
+            lastSong.value = "$songName - $artistName"
+        }
+    }
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -85,7 +96,8 @@ fun UserPage(){
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 65.dp).padding(horizontal = 16.dp),
+                    .padding(top = 65.dp)
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //profil
@@ -127,7 +139,7 @@ fun UserPage(){
                         style = Typography.titleMedium,
                         modifier = Modifier.padding(top = 15.dp)
                     )
-                    Text(text = "Le titre de ma chanson, L'Artiste.", //TODO : remplir avec la chanson du moment
+                    Text( text = lastSong.value ?: "Chargement...",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 15.dp)
                     )

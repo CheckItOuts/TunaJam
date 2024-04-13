@@ -13,10 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,9 +36,10 @@ import com.tunajam.app.ui.theme.TunaJamBleuPale
 import com.tunajam.app.ui.theme.TunaJamViolet
 import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
+import org.json.JSONArray
 
 
-const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
+const val CLIENT_ID = "91f756a765594cc39f41d6dcf0268c46"
 const val REDIRECT_URI = "com.tunajam.app://callback"
 const val REQUEST_CODE = 1337 // On peut mettre n'importe quel nombre ici
 
@@ -56,19 +55,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val accessToken = UserData.getAccessToken(this)
         val refreshToken = UserData.getRefreshToken(this)
-        // Possible que ça bug
         if (((accessToken != null) or (accessToken == "accessToken")) && ((refreshToken != null) or (refreshToken == "refreshToken"))) {
             val spotifyAPI = SpotifyAPI()
+            println("hello")
             if (refreshToken != null) {
-                spotifyAPI.refreshAccessToken(this,refreshToken) { newAccessToken ->
+                println("ici")
+                spotifyAPI.refreshAccessToken(this, refreshToken) { newAccessToken ->
                     if (newAccessToken != null) {
                         UserData.saveTokens(this, newAccessToken, refreshToken)
                     }
                 }
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+                finish()
             }
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-            finish()
         }
         setContent {
             LoginScreen(this@MainActivity)
@@ -92,6 +92,17 @@ class MainActivity : ComponentActivity() {
             db.addUser(displayName.toString(), imgUsr.toString()) // On ajoute l'utilisateur à la base de données
         }
         UserData.saveTokens(this, accessToken, refreshToken) // On sauvegarde les tokens
+        spotifyAPI.getUserTopTracks(this, accessToken, refreshToken) { tracks ->
+            if (tracks != null) {
+                for (i in 0 until tracks.size) {
+                    val trackUri = tracks[i].get("id").toString()
+                    val trackName = tracks[i].get("name").toString()
+                    val trackArtist = (tracks[i].get("artists") as JSONArray).optJSONObject(0)
+                        ?.optString("name").toString()
+                    db.addMusic(UserData.getUserName(this).toString(), trackUri, trackName, trackArtist)
+                }
+            }
+        }
         // On navigue vers l'activité principale
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)

@@ -54,7 +54,6 @@ import com.tunajam.app.data.SongDirectory
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamBeige
-import com.tunajam.app.ui.theme.TunaJamBleuPale
 import com.tunajam.app.ui.theme.TunaJamTheme
 import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
@@ -91,7 +90,7 @@ fun LoadSongRecommendationPanel(
     playlists: List<Playlist> = PlaylistDirectory.playlists
 ) {
     Text(
-        text = "Mes Recommandations:",
+        text = "Mes Recommandations: (selon le goût de mes amis)",
         style = Typography.titleMedium,
     )
     Row(
@@ -154,7 +153,6 @@ fun DisplayRecomandedTitle(song: Song, modifier: Modifier, playlists: List<Playl
                     contentScale = ContentScale.Crop,
                 )
                 if (!removeSong.value) {
-                    //Text(text = "Recommended by "+song.friend, color = Color.Gray,fontSize = 10.sp, lineHeight = 10.sp)
                     AsyncImage(model = ImageRequest.Builder(context = LocalContext.current)
                         .data(song.url)
                         .crossfade(true)
@@ -199,7 +197,9 @@ fun DisplayRecomandedTitle(song: Song, modifier: Modifier, playlists: List<Playl
                                             accessToken,
                                             refreshToken,
                                             playlist.id,
-                                            song.songUri
+                                            song.songUri,
+                                            song.author,
+                                            song.title
                                         ) {
                                             if (it) removeSong.value = true
                                         }
