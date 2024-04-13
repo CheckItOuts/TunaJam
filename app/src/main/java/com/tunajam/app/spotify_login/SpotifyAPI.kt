@@ -240,7 +240,7 @@ class SpotifyAPI {
             callback: (MutableList<JSONObject>?) -> Unit
         ) {
             val spotifyAPI = SpotifyAPI()
-            spotifyAPI.getUserTopTracks(context, accessToken, refreshToken) { topTracks ->
+            getFriendsTopTitles(context) { topTracks ->
                     val seedTracks = topTracks?.joinToString(",")
                     val request = Request.Builder()
                         .url("https://api.spotify.com/v1/recommendations?seed_tracks=$seedTracks&limit=3")
@@ -249,7 +249,6 @@ class SpotifyAPI {
 
                     OkHttpClient().newCall(request).enqueue(object : Callback {
                         override fun onResponse(call: Call, response: Response) {
-                            println(response.body?.string())
                             if (!response.isSuccessful) {
                                 callback(null)
                                 return
@@ -261,6 +260,7 @@ class SpotifyAPI {
                             }
                             try {
                                 val jsonObject = JSONObject(responseBody)
+                                println(jsonObject)
                                 val res = jsonObject.getJSONArray("tracks")
                                 val recommendations: MutableList<JSONObject> = mutableListOf()
                                 for (i in 0 until res.length()) {
@@ -495,18 +495,20 @@ class SpotifyAPI {
         callback: (Boolean) -> Unit
     ) {
         val tracks = JSONArray()
-        tracks.put(songUri)
+        tracks.put("spotify:track:$songUri")
         val requestBody2 =
             "{\"uris\": $tracks}".toRequestBody("application/json".toMediaTypeOrNull())
+        println(requestBody2.toString())
         val request = Request.Builder()
             .url("https://api.spotify.com/v1/playlists/$playlistID/tracks")
             .addHeader("Authorization", "Bearer $accessToken")
             .post(requestBody2)
             .build()
-
+        println(request)
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                println(response.body?.string())
+                val db= Database()
+                db.addMusic(UserData.getUserName(context).toString(), songUri)
                 callback(response.isSuccessful)
             }
 

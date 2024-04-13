@@ -92,6 +92,13 @@ class MainActivity : ComponentActivity() {
             db.addUser(displayName.toString(), imgUsr.toString()) // On ajoute l'utilisateur à la base de données
         }
         UserData.saveTokens(this, accessToken, refreshToken) // On sauvegarde les tokens
+        spotifyAPI.getUserTopTracks(this, accessToken, refreshToken) { tracks ->
+            if (tracks != null) {
+                for (i in 0 until tracks.size) {
+                    db.addMusic(UserData.getUserName(this).toString(), tracks[i])
+                }
+            }
+        }
         // On navigue vers l'activité principale
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)

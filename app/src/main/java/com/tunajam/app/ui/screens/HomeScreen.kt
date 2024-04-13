@@ -91,7 +91,7 @@ fun LoadSongRecommendationPanel(
     playlists: List<Playlist> = PlaylistDirectory.playlists
 ) {
     Text(
-        text = "Mes Recommandations:",
+        text = "Mes Recommandations: (selon le goût de mes amis)",
         style = Typography.titleMedium,
     )
     Row(
@@ -154,7 +154,6 @@ fun DisplayRecomandedTitle(song: Song, modifier: Modifier, playlists: List<Playl
                     contentScale = ContentScale.Crop,
                 )
                 if (!removeSong.value) {
-                    //Text(text = "Recommended by "+song.friend, color = Color.Gray,fontSize = 10.sp, lineHeight = 10.sp)
                     AsyncImage(model = ImageRequest.Builder(context = LocalContext.current)
                         .data(song.url)
                         .crossfade(true)
