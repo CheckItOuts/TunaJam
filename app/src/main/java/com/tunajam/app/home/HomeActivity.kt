@@ -102,6 +102,7 @@ class HomeActivity : ComponentActivity() {
                 }
             }
             SpotifyAPI.getUserRecommendation(this, accessToken, refreshToken) { tracks ->
+                runOnUiThread {
                 SongDirectory.clearSongs()
                     if (tracks != null) {
                         for (i in 0 until tracks.size) {
@@ -119,7 +120,7 @@ class HomeActivity : ComponentActivity() {
                             db.addMusic(pseudo, idSong)
                         }
                     }
-                runOnUiThread {
+
                     setContent {
                         TunaJamTheme {
                             val tunaJamUiState = TunaJamUiState.Success(playlistPhotos)

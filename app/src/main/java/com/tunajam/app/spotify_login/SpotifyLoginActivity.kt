@@ -56,10 +56,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val accessToken = UserData.getAccessToken(this)
         val refreshToken = UserData.getRefreshToken(this)
-        // Possible que ça bug
         if (((accessToken != null) or (accessToken == "accessToken")) && ((refreshToken != null) or (refreshToken == "refreshToken"))) {
             val spotifyAPI = SpotifyAPI()
-            if (refreshToken != null) {
+            if (refreshToken != null && ((accessToken == "accessToken") or (accessToken == null))) {
+                println(refreshToken)
                 spotifyAPI.refreshAccessToken(this,refreshToken) { newAccessToken ->
                     if (newAccessToken != null) {
                         UserData.saveTokens(this, newAccessToken, refreshToken)
