@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -122,9 +122,16 @@ class AddFriendActivity : ComponentActivity() {
                                     val userExists = users.contains(spotifyUsername)
                                     val pseudo = UserData.getUserName(context)
                                     if (userExists && pseudo != spotifyUsername) {
+                                        val db = Database()
                                         val photo = TunaJamPhoto(
                                             spotifyUsername,
-                                            "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg"
+                                            db.getFriendPhotoByUserCollection(spotifyUsername){friendPhotoUrl->
+                                                if (friendPhotoUrl != null){
+                                                    friendPhotoUrl
+                                                } else{
+                                                    Log.d("AddFriendActivity", ": Photo non trouvée")
+                                                }
+                                            }.toString()
                                         )
                                         FriendDirectory.addFriend(
                                             spotifyUsername,
@@ -132,7 +139,6 @@ class AddFriendActivity : ComponentActivity() {
                                             true,
                                             photo
                                         )
-                                        val db = Database()
                                         db.addFriend(pseudo.toString(), spotifyUsername)
                                         onClickHome() // Retour à la page d'accueil
                                     } else {

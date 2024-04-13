@@ -64,9 +64,11 @@ class Database {
      *
      * @return None
      */
-    fun addMusic(pseudo : String, idMusic : String){
+    fun addMusic(pseudo : String, idMusic : String, nameMusic : String, artistMusic : String){
         val music = hashMapOf(
             "id" to idMusic,
+            "name" to nameMusic,
+            "artist" to artistMusic,
             "time" to Timestamp.now()
         )
 
@@ -176,6 +178,22 @@ class Database {
                 callback(null) // Retourner null en cas d'échec
             }
     }
+
+    fun getFriendPhotoByUserCollection(friendPseudo: String, onComplete: (String?) -> Unit) {
+        db.collection("users").document(friendPseudo)
+            .get()
+            .addOnSuccessListener { document ->
+                val friendData = document.data
+                val friendPhotoUrl = friendData?.get("photo") as? String
+                onComplete(friendPhotoUrl)
+            }
+            .addOnFailureListener { e ->
+                Log.d(TAG, "Erreur lors de la récupération de la photo de l'ami : $e")
+                onComplete(null)
+            }
+    }
+
+
 
 
     fun deleteFriend(userPseudo: String, friendPseudo: String){

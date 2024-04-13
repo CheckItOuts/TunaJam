@@ -43,9 +43,9 @@ fun testButton() {
         db.addUser("Axel", "test")
         db.addFriend("Louison", "Axel")
         db.addFriend("Louison", "test")
-        db.addMusic("Louison", "789")
-        db.addMusic("Louison", "456")
-        db.addMusic("Louison", "123")
+        db.addMusic("Louison", "789", "e", "e")
+        db.addMusic("Louison", "456", "e", "e")
+        db.addMusic("Louison", "123", "e", "e")
         db.getUser("Louison") { userData ->
             if (userData != null) {
                 Log.d("", userData.toString())

@@ -95,7 +95,7 @@ class HomeActivity : ComponentActivity() {
                             val friendPhotoUrl = userData["photo"].toString()
                             val friendPhoto = TunaJamPhoto(
                                 friendName,
-                                "https://pbs.twimg.com/profile_images/1611108206050250759/ORaNxrfb_400x400.jpg"
+                                friendPhotoUrl
                             )
                             FriendDirectory.addFriend(friendName, friendName, true, friendPhoto)
                         }
@@ -118,7 +118,7 @@ class HomeActivity : ComponentActivity() {
                                     ?.optString("name").toString(),
                                 imageUrl.toString(), idSong
                             )
-                            db.addMusic(pseudo, idSong)
+                            db.addMusic(pseudo, idSong, "test", "test")
                         }
                     }
                     setContent {
