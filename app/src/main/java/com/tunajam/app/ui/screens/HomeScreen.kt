@@ -54,7 +54,6 @@ import com.tunajam.app.data.SongDirectory
 import com.tunajam.app.model.TunaJamPhoto
 import com.tunajam.app.spotify_login.SpotifyAPI
 import com.tunajam.app.ui.theme.TunaJamBeige
-import com.tunajam.app.ui.theme.TunaJamBleuPale
 import com.tunajam.app.ui.theme.TunaJamTheme
 import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.UserData
@@ -198,7 +197,9 @@ fun DisplayRecomandedTitle(song: Song, modifier: Modifier, playlists: List<Playl
                                             accessToken,
                                             refreshToken,
                                             playlist.id,
-                                            song.songUri
+                                            song.songUri,
+                                            song.author,
+                                            song.title
                                         ) {
                                             if (it) removeSong.value = true
                                         }
