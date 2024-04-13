@@ -39,7 +39,7 @@ import com.tunajam.app.user_data.UserData
 import org.json.JSONArray
 
 
-const val CLIENT_ID = "91f756a765594cc39f41d6dcf0268c46"
+const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
 const val REDIRECT_URI = "com.tunajam.app://callback"
 const val REQUEST_CODE = 1337 // On peut mettre n'importe quel nombre ici
 
@@ -63,11 +63,11 @@ class MainActivity : ComponentActivity() {
                 spotifyAPI.refreshAccessToken(this, refreshToken) { newAccessToken ->
                     if (newAccessToken != null) {
                         UserData.saveTokens(this, newAccessToken, refreshToken)
+                        val intent = Intent(this, HomeActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
                 }
-                val intent = Intent(this, HomeActivity::class.java)
-                startActivity(intent)
-                finish()
             }
         }
         setContent {

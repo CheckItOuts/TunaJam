@@ -84,12 +84,17 @@ class SpotifyAPI {
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                println(responseBody)
-                val jsonObject = JSONObject(responseBody!!)
-                val accessToken = jsonObject.getString("access_token")
-                UserData.saveTokens(context, accessToken, refreshToken)
-                callback(accessToken)
+                try {
+                    val responseBody = response.body?.string()
+                    println(responseBody)
+                    val jsonObject = JSONObject(responseBody!!)
+                    val accessToken = jsonObject.getString("access_token")
+                    UserData.saveTokens(context, accessToken, refreshToken)
+                    callback(accessToken)
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    callback(null)
+                }
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -157,8 +162,8 @@ class SpotifyAPI {
     }
 
     companion object {
-        const val CLIENT_ID = "91f756a765594cc39f41d6dcf0268c46"
-        const val CLIENT_SECRET = "b4a1bd97d4a44b3ba35ccd582831f01c"
+        const val CLIENT_ID = "385d1740c16f4437b66802d5d0886d44"
+        const val CLIENT_SECRET = "fd0de51ee127491fb6472f89bcd149d5"
         /**
          * Cette fonction permet d'échanger le code d'authentification contre des tokens d'accès.
          */
