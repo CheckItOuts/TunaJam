@@ -7,6 +7,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,11 +18,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,11 +45,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.tunajam.app.R
 import com.tunajam.app.data.FriendDirectory
 import com.tunajam.app.firebase.Database
 import com.tunajam.app.home.HomeActivity
 import com.tunajam.app.spotify_login.SpotifyAPI
+import com.tunajam.app.ui.theme.Typography
 import com.tunajam.app.user_data.PlaylistData
 import com.tunajam.app.user_data.UserData
 import java.util.Locale
@@ -53,7 +67,8 @@ class PlaylistGenerationActivity : ComponentActivity() {
             PlaylistGenerationPage(onClickHome = {
                 val intent = Intent(this, HomeActivity::class.java)
                 startActivity(intent)
-                finish() }, context = this)
+                finish()
+            }, context = this)
         }
     }
 }
@@ -61,7 +76,7 @@ class PlaylistGenerationActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
+fun PlaylistGenerationPage(onClickHome: () -> Unit, context: Context) {
     val friendsList = FriendDirectory.friends.map { it.pseudo }
     var selectedFriends by remember { mutableStateOf(emptyList<String>()) }
     var maxAcousticness by remember { mutableFloatStateOf(0.5f) }
@@ -71,32 +86,143 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
     var maxSpeechiness by remember { mutableFloatStateOf(0.5f) }
     var selectedGenres by remember { mutableStateOf(emptyList<String>()) }
     var searchQuery by remember { mutableStateOf("") }
-    val genresList = listOf("acoustic", "afrobeat", "alt-rock",
-        "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues",
-        "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house",
-        "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall",
-        "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub",
-        "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk",
-        "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy",
-        "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk",
-        "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol",
-        "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal",
-        "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera",
-        "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop",
-        "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton",
-        "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo",
-        "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish",
-        "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish",
-        "work-out", "world-music")
+    val genresList = listOf(
+        "acoustic",
+        "afrobeat",
+        "alt-rock",
+        "alternative",
+        "ambient",
+        "anime",
+        "black-metal",
+        "bluegrass",
+        "blues",
+        "bossanova",
+        "brazil",
+        "breakbeat",
+        "british",
+        "cantopop",
+        "chicago-house",
+        "children",
+        "classical",
+        "club",
+        "comedy",
+        "country",
+        "dancehall",
+        "death-metal",
+        "deep-house",
+        "detroit-techno",
+        "disco",
+        "disney",
+        "drum-and-bass",
+        "dub",
+        "dubstep",
+        "edm",
+        "electro",
+        "electronic",
+        "emo",
+        "folk",
+        "forro",
+        "french",
+        "funk",
+        "garage",
+        "german",
+        "gospel",
+        "goth",
+        "grindcore",
+        "groove",
+        "grunge",
+        "guitar",
+        "happy",
+        "hard-rock",
+        "hardcore",
+        "hardstyle",
+        "heavy-metal",
+        "hip-hop",
+        "holidays",
+        "honky-tonk",
+        "house",
+        "idm",
+        "indian",
+        "indie",
+        "indie-pop",
+        "industrial",
+        "iranian",
+        "j-dance",
+        "j-idol",
+        "j-pop",
+        "j-rock",
+        "jazz",
+        "k-pop",
+        "kids",
+        "latin",
+        "latino",
+        "malay",
+        "mandopop",
+        "metal",
+        "metal-misc",
+        "metalcore",
+        "minimal-techno",
+        "movies",
+        "mpb",
+        "new-age",
+        "new-release",
+        "opera",
+        "pagode",
+        "philippines-opm",
+        "piano",
+        "pop",
+        "pop-film",
+        "post-dubstep",
+        "power-pop",
+        "progressive-house",
+        "psych-rock",
+        "punk",
+        "punk-rock",
+        "r-n-b",
+        "rainy-day",
+        "reggae",
+        "reggaeton",
+        "road-trip",
+        "rock",
+        "rock-n-roll",
+        "rockabilly",
+        "romance",
+        "sad",
+        "salsa",
+        "samba",
+        "sertanejo",
+        "show-tunes",
+        "singer-songwriter",
+        "ska",
+        "songwriter",
+        "soul",
+        "soundtracks",
+        "spanish",
+        "swedish",
+        "synth-pop",
+        "tango",
+        "techno",
+        "trance",
+        "trip-hop",
+        "turkish",
+        "world-music"
+    )
+
+    val eventsList = listOf("chill", "dance", "party", "sleep", "study", "summer", "workout")
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text="Génération de playlist",
-                    style = MaterialTheme.typography.headlineSmall)}
+                title = {
+                    Text(
+                        text = "Génération de playlist",
+                        style = Typography.titleLarge
+                    )
+                }
 
             )
         },
+        modifier = Modifier.padding(16.dp),
         content = {
             Column(
                 modifier = Modifier
@@ -123,19 +249,25 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                 // Parameter sliders
                 Text(
                     text = "Ajuste tes paramètres:",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = Typography.titleMedium,
                     modifier = Modifier
                         .padding(bottom = 15.dp)
                         .align(CenterHorizontally)
                 )
-                ParameterSlider("Acoustique", maxAcousticness) {maxAcousticness = it }
+                ParameterSlider("Acoustique", maxAcousticness) { maxAcousticness = it }
                 ParameterSlider("Dansant", maxDanceability) { maxDanceability = it }
-                ParameterSlider("Instrumental", maxInstrulmentalness ) {maxInstrulmentalness = it }
+                ParameterSlider("Instrumental", maxInstrulmentalness) { maxInstrulmentalness = it }
                 ParameterSlider("Positivité", maxValence) { maxValence = it }
-                ParameterSlider("Paroles", maxSpeechiness ) {maxSpeechiness  = it }
+                ParameterSlider("Paroles", maxSpeechiness) { maxSpeechiness = it }
 
-                Text(text = "Genres musicaux : (sélectionne au moins un genre)",
-                    style = MaterialTheme.typography.bodyLarge,
+
+                EventSelection(eventsList, onEventSelected = { event ->
+                    selectedGenres = selectedGenres.toMutableList().apply { add(event) }}, onEventUnselected =  { event ->
+                    selectedGenres = selectedGenres.filter { it != event }
+                })
+                Text(
+                    text = "Genres musicaux : (sélectionne au moins un genre)",
+                    style = Typography.titleMedium,
                     modifier = Modifier.padding(top = 15.dp)
                 )
                 TextField(
@@ -146,7 +278,6 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 16.dp)
                 )
-
                 GenreSelection(
                     genresList = genresList.filter { it.contains(searchQuery, ignoreCase = true) },
                     selectedGenres = selectedGenres,
@@ -177,7 +308,11 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                         } else {
                             // Afficher un message d'erreur à l'utilisateur
                             // Cela pourrait être un Toast, un Snackbar ou toute autre méthode que vous préférez
-                            Toast.makeText(context, "Sélectionnez entre 1 et 5 genres et entre 0 et 5 amis.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Sélectionnez entre 1 et 5 genres et entre 0 et 5 amis.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     modifier = Modifier
@@ -187,9 +322,10 @@ fun PlaylistGenerationPage(onClickHome : () -> Unit, context: Context){
                     Text("Générer la playlist")
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Button(onClick = {
-                    onClickHome()
-                },
+                Button(
+                    onClick = {
+                        onClickHome()
+                    },
                     modifier = Modifier.align(CenterHorizontally)
                 ) {
                     Text("Retour à l'accueil")
@@ -218,9 +354,11 @@ fun ParameterSlider(label: String, value: Float, onValueChange: (Float) -> Unit)
 /**
  * Génère une playlist en fonction des paramètres donnés.
  */
-fun generatePlaylist(context : Context, friends: List<String>, maxAcousticness: Float,
-                     maxDanceability: Float, maxInstrulmentalness: Float,
-                     maxValence: Float, maxSpeechiness: Float, selectedGenres: List<String>) {
+fun generatePlaylist(
+    context: Context, friends: List<String>, maxAcousticness: Float,
+    maxDanceability: Float, maxInstrulmentalness: Float,
+    maxValence: Float, maxSpeechiness: Float, selectedGenres: List<String>
+) {
     val accessToken = UserData.getAccessToken(context).toString()
     val refreshToken = UserData.getRefreshToken(context).toString()
     val genres = selectedGenres.toMutableList()
@@ -230,10 +368,10 @@ fun generatePlaylist(context : Context, friends: List<String>, maxAcousticness: 
 
     for (friend in friendsList) {
         db.getLastMusic(friend) { music ->
-           if (music != null) {
+            if (music != null) {
                 seedMusic.add(music["id"].toString())
-           }
-       }
+            }
+        }
     }
 
     val parameters = mutableMapOf(
@@ -245,16 +383,85 @@ fun generatePlaylist(context : Context, friends: List<String>, maxAcousticness: 
         "seed_genres" to genres,
         "seed_tracks" to seedMusic
     )
-    SpotifyAPI.getGeneratedPlaylistTracks(context, accessToken, refreshToken, parameters) { tracks ->
+    SpotifyAPI.getGeneratedPlaylistTracks(
+        context,
+        accessToken,
+        refreshToken,
+        parameters
+    ) { tracks ->
         println(tracks)
         if (tracks != null) {
-            PlaylistData.savePlaylist(context,tracks)
+            PlaylistData.savePlaylist(context, tracks)
             val intent = Intent(context, PlaylistDisplayActivity::class.java)
             context.startActivity(intent)
         }
     }
 }
 
+@Composable
+fun EventSelection(
+    eventsList: List<String>,
+    onEventSelected: (String) -> Unit,
+    onEventUnselected: (String) -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        for (i in 0..2) {
+            EventItem(event = eventsList[i], onEventSelected = onEventSelected, onEventUnselected=onEventUnselected)
+        }
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        for (i in 3..4) {
+            EventItem(event = eventsList[i], onEventSelected = onEventSelected, onEventUnselected=onEventUnselected)
+        }
+    }
+
+}
+
+
+@Composable
+fun EventItem(
+    event: String,
+    onEventSelected: (String) -> Unit,
+    onEventUnselected: (String) -> Unit,
+) {
+    var selected = remember{mutableStateOf(false)}
+    selected != selected
+    ElevatedButton({
+        if (selected.value){
+            onEventSelected
+        }
+        else{
+            onEventUnselected
+        }
+
+    }) {
+        Box(
+            Modifier
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .clickable { onEventSelected(event) }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.chill),
+                    contentDescription = "Event Logo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(65.dp) // Taille de l'image
+                        .clip(CircleShape) // Clipping pour rendre l'image ronde
+                )
+                Text(text = event)
+            }
+        }
+    }
+}
 
 @Composable
 fun GenreSelection(
@@ -266,7 +473,8 @@ fun GenreSelection(
     var expanded by remember { mutableStateOf(false) }
 
     Column {
-        val visibleGenres = if (expanded) genresList else genresList.take(5) // Change 5 to desired initial number of visible items
+        val visibleGenres =
+            if (expanded) genresList else genresList.take(5) // Change 5 to desired initial number of visible items
         visibleGenres.forEach { genre ->
             val isChecked = selectedGenres.contains(genre)
             Row(
@@ -302,6 +510,7 @@ fun GenreSelection(
         }
     }
 }
+
 @Composable
 fun FriendSelection(
     friendsList: List<String>,
